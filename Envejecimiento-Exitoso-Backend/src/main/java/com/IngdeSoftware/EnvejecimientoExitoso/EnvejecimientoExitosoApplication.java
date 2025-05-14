@@ -1,4 +1,4 @@
-package com.IngdeSoftware.Equipo2.Envejecimiento.Exitoso;
+package com.IngdeSoftware.EnvejecimientoExitoso;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

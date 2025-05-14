@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Envejecimiento-Exitoso-Backend/target/classes/static/node/node_modules/npm/index.js
 Envejecimiento-Exitoso-Backend/target/classes/static/node/node_modules/npm/LICENSE
 Envejecimiento-Exitoso-Backend/target/classes/static/node/node_modules/npm/package.json
@@ -2585,3 +2586,10 @@ Envejecimiento-Exitoso-Backend/target/classes/static/css/login.css
 Envejecimiento-Exitoso-Backend/target/classes/static/css/payment.css
 Envejecimiento-Exitoso-Backend/target/classes/static/css/registro.css
 Envejecimiento-Exitoso-Backend/target/classes/static/js/modulepreload-polyfill-B5Qt9EMX.js
+=======
+Envejecimiento-Exitoso-Backend/src/main/resources/application.properties
+Envejecimiento-Exitoso-Backend/pom.xml
+/Envejecimiento-Exitoso-Frontend/node_modules/
+/Envejecimiento-Exitoso-Frontend/dist/
+.idea/modules.xml
+>>>>>>> Undermain
