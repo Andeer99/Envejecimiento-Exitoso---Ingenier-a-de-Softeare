@@ -1,6 +1,11 @@
 package com.IngdeSoftware.EnvejecimientoExitoso.service;
 
+import com.IngdeSoftware.EnvejecimientoExitoso.dto.carrito.CarritoDTO;
+import com.IngdeSoftware.EnvejecimientoExitoso.dto.carrito.CarritoItemDTO;
+import com.IngdeSoftware.EnvejecimientoExitoso.repository.CarritoRepository;
+import com.IngdeSoftware.EnvejecimientoExitoso.repository.ProductoRepository;
 import com.IngdeSoftware.EnvejecimientoExitoso.repository.UsuarioRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

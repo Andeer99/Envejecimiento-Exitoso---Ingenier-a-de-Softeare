@@ -2,6 +2,8 @@ package com.IngdeSoftware.EnvejecimientoExitoso.service;
 
 import com.IngdeSoftware.EnvejecimientoExitoso.controller.PagoController;
 import com.IngdeSoftware.EnvejecimientoExitoso.model.Pago;
+import com.IngdeSoftware.EnvejecimientoExitoso.repository.PagoRepository;
+import com.IngdeSoftware.EnvejecimientoExitoso.repository.PedidoRepository;
 import org.springframework.http.HttpEntity;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +23,7 @@ public class PagoService {
     @Value("${pasarela.url}") private String pasarelaUrl;
 
     /** Paso 1: cliente inicia el pago  */
-    public PagoInitResponse initPayment(Long pedidoId, String email) {
+    public PagoController.PagoInitResponse initPayment(Long pedidoId, String email) {
         var pedido = pedidoRepo.findByIdAndUsuarioEmail(pedidoId, email)
                 .orElseThrow(() -> new EntityNotFoundException("Pedido no encontrado"));
 
@@ -42,7 +44,7 @@ public class PagoService {
     }
 
     /** Paso 2: confirmación desde la pasarela */
-    public void processCallback(PasarelaCallback cb) {
+    public void processCallback(PagoController.PasarelaCallback cb) {
         Pago pago = pagoRepo.findByPasarelaId(cb.transaccionId())
                 .orElseThrow(() -> new EntityNotFoundException("Pago no encontrado"));
 

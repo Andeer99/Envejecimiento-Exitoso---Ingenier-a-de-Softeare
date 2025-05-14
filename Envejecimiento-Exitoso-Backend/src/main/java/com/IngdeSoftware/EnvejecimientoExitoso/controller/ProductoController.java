@@ -1,9 +1,14 @@
 package com.IngdeSoftware.EnvejecimientoExitoso.controller;
 
+import com.IngdeSoftware.EnvejecimientoExitoso.dto.producto.ProductoDTO;
+import com.IngdeSoftware.EnvejecimientoExitoso.service.ProductoService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/productos")

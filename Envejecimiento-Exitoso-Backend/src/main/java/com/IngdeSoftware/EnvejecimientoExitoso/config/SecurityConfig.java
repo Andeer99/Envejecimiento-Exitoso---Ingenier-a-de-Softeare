@@ -1,84 +1,58 @@
 package com.IngdeSoftware.EnvejecimientoExitoso.config;
 
+import com.IngdeSoftware.EnvejecimientoExitoso.service.UsuarioDetailsService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.web
-        .builders.HttpSecurity;
-import org.springframework.security.config.annotation.web
-        .configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-@EnableWebSecurity
+@EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
-    /**
-     * Configura toda la cadena de filtros de seguridad
-     */
+
+    private final UsuarioDetailsService uds;
+    private final PasswordEncoder encoder;
+    private final JwtAuthFilter jwtFilter;
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   DaoAuthenticationProvider authProvider) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // 🔑 Registramos nuestro proveedor de autenticación
-                .authenticationProvider(authProvider)
-                // 🔓 Rutas públicas
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authProvider())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/",
-                                "/login.html",
-                                "/css/**",
-                                "/js/**",
-                                "/api/auth/register"
+                                "/auth/**",
+                                "/api/clientes",
+                                "/css/**", "/js/**", "/",
+                                "/login.html", "/registro.html"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
-                // 📝 Configuración de formulario de login
-                .formLogin(form -> form
-                        .loginPage("/login.html")
-                        .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/", true)
-                        .permitAll()
-                )
-                // 🔒 Configuración de logout
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login.html?logout")
-                        .permitAll()
-                );
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
-    /**
-     * Proveedor que conecta tu UserDetailsService con el PasswordEncoder.
-     */
     @Bean
-    public DaoAuthenticationProvider authenticationProvider(
-            UserDetailsService uds,
-            PasswordEncoder passwordEncoder) {
+    public DaoAuthenticationProvider authProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(uds);
-        provider.setPasswordEncoder(passwordEncoder);
+        provider.setPasswordEncoder(encoder);
         return provider;
     }
-    /**
-     * AuthenticationManager “global” que usa la configuración previa.
-     * Útil si quieres inyectarlo manualmente en algún servicio.
-     */
+
     @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration authConfig) throws Exception {
-        return authConfig.getAuthenticationManager();
-    }
-    /**
-     * PasswordEncoder para encriptar/validar contraseñas.
-     */
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    public AuthenticationManager authManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 }

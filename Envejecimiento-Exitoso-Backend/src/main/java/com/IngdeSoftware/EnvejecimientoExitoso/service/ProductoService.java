@@ -1,12 +1,10 @@
 package com.IngdeSoftware.EnvejecimientoExitoso.service;
+import com.IngdeSoftware.EnvejecimientoExitoso.dto.producto.ProductoDTO;
+import com.IngdeSoftware.EnvejecimientoExitoso.mapper.ProductoMapper;
+import com.IngdeSoftware.EnvejecimientoExitoso.model.Producto;
 import jakarta.persistence.EntityNotFoundException;
-import com.IngdeSoftware.EnvejecimientoExitoso.dto.carrito.CarritoDTO;
-import com.IngdeSoftware.EnvejecimientoExitoso.dto.carrito.CarritoItemDTO;
-import com.IngdeSoftware.EnvejecimientoExitoso.mapper.CarritoMapper;
-import com.IngdeSoftware.EnvejecimientoExitoso.model.CarritoItem;
-import com.IngdeSoftware.EnvejecimientoExitoso.repository.CarritoRepository;
 import com.IngdeSoftware.EnvejecimientoExitoso.repository.ProductoRepository;
-import com.IngdeSoftware.EnvejecimientoExitoso.repository.UsuarioRepository;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

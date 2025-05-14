@@ -1,6 +1,8 @@
 package com.IngdeSoftware.EnvejecimientoExitoso.controller;
 
 
+import com.IngdeSoftware.EnvejecimientoExitoso.dto.pedido.PedidoDTO;
+import com.IngdeSoftware.EnvejecimientoExitoso.service.PedidoService;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.http.HttpStatus;

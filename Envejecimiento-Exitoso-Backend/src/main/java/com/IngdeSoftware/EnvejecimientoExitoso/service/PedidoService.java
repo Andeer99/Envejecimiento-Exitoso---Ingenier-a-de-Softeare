@@ -1,5 +1,9 @@
 package com.IngdeSoftware.EnvejecimientoExitoso.service;
 
+import com.IngdeSoftware.EnvejecimientoExitoso.dto.pedido.PedidoDTO;
+import com.IngdeSoftware.EnvejecimientoExitoso.model.Pedido;
+import com.IngdeSoftware.EnvejecimientoExitoso.repository.CarritoRepository;
+import com.IngdeSoftware.EnvejecimientoExitoso.repository.PedidoRepository;
 import com.IngdeSoftware.EnvejecimientoExitoso.repository.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
