@@ -1,7 +1,7 @@
 package com.IngdeSoftware.EnvejecimientoExitoso.service;
 
 import com.IngdeSoftware.EnvejecimientoExitoso.model.Usuario;
-import com.IngdeSoftware.EnvejecimientoExitoso.service.UsuarioRepository;
+import com.IngdeSoftware.EnvejecimientoExitoso.repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

@@ -1,5 +1,6 @@
 package com.IngdeSoftware.EnvejecimientoExitoso.service;
 
+import com.IngdeSoftware.EnvejecimientoExitoso.repository.UsuarioRepository;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
 import com.IngdeSoftware.EnvejecimientoExitoso.model.Usuario;
