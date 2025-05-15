@@ -631,3 +631,13 @@ Envejecimiento-Exitoso-Frontend/node_modules/vite/types/metadata.d.ts
 Envejecimiento-Exitoso-Frontend/node_modules/vite/types/package.json
 Envejecimiento-Exitoso-Frontend/node_modules/vite/types/internal/cssPreprocessorOptions.d.ts
 Envejecimiento-Exitoso-Frontend/node_modules/vite/types/internal/lightningcssOptions.d.ts
+.idea/.gitignore
+.idea/compiler.xml
+.idea/dataSources.xml
+.idea/encodings.xml
+.idea/Ing de software.iml
+.idea/jarRepositories.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/jsLibraryMappings.xml

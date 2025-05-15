@@ -22,7 +22,7 @@ public class Pago {
     @Enumerated(EnumType.STRING)
     private EstadoPago estado = EstadoPago.PENDIENTE;
 
-    /* ID devuelto por la pasarela externa */
+    /* id devuelto por la pasarela externa */
     @Column(unique = true, length = 64)
     private String pasarelaId;
 
@@ -38,4 +38,8 @@ public class Pago {
     public void actualizarEstado(String s) {
         this.estado = EstadoPago.valueOf(s.toUpperCase());
     }
+
+    @Column(columnDefinition = "TEXT")
+    private String pasarelaPayload;
+
 }

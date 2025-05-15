@@ -1,7 +1,10 @@
 package com.IngdeSoftware.EnvejecimientoExitoso.service;
 
 import com.IngdeSoftware.EnvejecimientoExitoso.controller.PagoController;
+import com.IngdeSoftware.EnvejecimientoExitoso.dto.pago.PagoDTO;
+import com.IngdeSoftware.EnvejecimientoExitoso.mapper.PagoMapper;
 import com.IngdeSoftware.EnvejecimientoExitoso.model.Pago;
+import com.IngdeSoftware.EnvejecimientoExitoso.model.Pedido;
 import com.IngdeSoftware.EnvejecimientoExitoso.repository.PagoRepository;
 import com.IngdeSoftware.EnvejecimientoExitoso.repository.PedidoRepository;
 import org.springframework.http.HttpEntity;
@@ -12,6 +15,9 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import java.util.Map;
 
 @Service @RequiredArgsConstructor
 @Transactional
@@ -21,7 +27,18 @@ public class PagoService {
     private final PagoRepository pagoRepo;
     private final RestTemplate rest;                  // Bean común para HTTP
     @Value("${pasarela.url}") private String pasarelaUrl;
+    private HttpHeaders buildHeaders() {
+        HttpHeaders h = new HttpHeaders();
+        h.setContentType(MediaType.APPLICATION_JSON);
+        return h;
+    }
+    private final PagoMapper pagoMapper;
 
+    public PagoDTO getPago(Long pagoId) {
+        Pago pago = pagoRepo.findById(pagoId)
+                .orElseThrow(() -> new EntityNotFoundException("Pago inexistente"));
+        return pagoMapper.toDto(pago);
+    }
     /** Paso 1: cliente inicia el pago  */
     public PagoController.PagoInitResponse initPayment(Long pedidoId, String email) {
         var pedido = pedidoRepo.findByIdAndUsuarioEmail(pedidoId, email)
@@ -53,11 +70,24 @@ public class PagoService {
     }
 
     /* -- helpers privados -- */
-    private HttpHeaders buildHeaders() {
-        HttpHeaders h = new HttpHeaders();
-        h.setContentType(MediaType.APPLICATION_JSON);
-        return h;
+    private Map<String, Object> buildBody(Pedido pedido, Pago pago) {
+        return Map.of(
+                "amount",          pago.getMonto(),
+                "currency",        "MXN",
+                "orderId",         pedido.getId(),
+                "transactionId",   pago.getId(),
+                "callbackUrl",     "https://tu-dominio.com/api/pagos/confirmacion"
+        );
     }
-    private Object buildBody(/*…*/) { /* contruye JSON para la pasarela */ return null; }
-    private String extractRedirectUrl(String body) { /* parsea JSON */ return "https://…"; }
+    private String extractRedirectUrl(String bodyJson) {
+        /* parsea JSON */
+        try {
+            com.fasterxml.jackson.databind.JsonNode node =
+                    new com.fasterxml.jackson.databind.ObjectMapper()
+                            .readTree(bodyJson);
+            return node.path("redirect").asText();
+        } catch (Exception e) {
+            return "";  // o lanza tu propia excepción
+        }
+    }
 }
