@@ -21,6 +21,54 @@ public class Pedido {
 
     private LocalDateTime fecha = LocalDateTime.now();
 
+    public EstadoPedido getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoPedido estado) {
+        this.estado = estado;
+    }
+
+    public BigDecimal getTotal() {
+        return total;
+    }
+
+    public void setTotal(BigDecimal total) {
+        this.total = total;
+    }
+
+    public List<PedidoItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<PedidoItem> items) {
+        this.items = items;
+    }
+
+    public LocalDateTime getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(LocalDateTime fecha) {
+        this.fecha = fecha;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     @Enumerated(EnumType.STRING)
     private EstadoPedido estado = EstadoPedido.NUEVO;
 

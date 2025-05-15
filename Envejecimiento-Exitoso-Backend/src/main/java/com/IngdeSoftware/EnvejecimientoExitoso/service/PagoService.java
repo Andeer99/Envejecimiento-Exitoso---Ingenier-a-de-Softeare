@@ -19,35 +19,45 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import java.util.Map;
 
-@Service @RequiredArgsConstructor
+
+@Service
 @Transactional
+
 public class PagoService {
 
     private final PedidoRepository pedidoRepo;
-    private final PagoRepository pagoRepo;
-    private final RestTemplate rest;                  // Bean común para HTTP
-    @Value("${pasarela.url}") private String pasarelaUrl;
-    private HttpHeaders buildHeaders() {
-        HttpHeaders h = new HttpHeaders();
-        h.setContentType(MediaType.APPLICATION_JSON);
-        return h;
+    private final PagoRepository   pagoRepo;
+    private final PagoMapper       pagoMapper;
+    private final RestTemplate     rest;
+    private final String           pasarelaUrl;
+
+    public PagoService(PedidoRepository pedidoRepo,
+                       PagoRepository pagoRepo,
+                       PagoMapper pagoMapper,
+                       RestTemplate rest,
+                       @Value("${pasarela.url}") String pasarelaUrl) {
+        this.pedidoRepo   = pedidoRepo;
+        this.pagoRepo     = pagoRepo;
+        this.pagoMapper   = pagoMapper;
+        this.rest         = rest;
+        this.pasarelaUrl  = pasarelaUrl;
     }
-    private final PagoMapper pagoMapper;
+    /* ---------- MÉTODOS PÚBLICOS ---------- */
 
     public PagoDTO getPago(Long pagoId) {
         Pago pago = pagoRepo.findById(pagoId)
                 .orElseThrow(() -> new EntityNotFoundException("Pago inexistente"));
         return pagoMapper.toDto(pago);
     }
-    /** Paso 1: cliente inicia el pago  */
-    public PagoController.PagoInitResponse initPayment(Long pedidoId, String email) {
+
+    public PagoInitResponse initPayment(Long pedidoId, String email) {
         var pedido = pedidoRepo.findByIdAndUsuarioEmail(pedidoId, email)
                 .orElseThrow(() -> new EntityNotFoundException("Pedido no encontrado"));
 
-        // 1. Creamos entidad Pago en estado PENDING
+        // 1) creo pago estado PENDING
         Pago pago = pagoRepo.save(Pago.fromPedido(pedido));
 
-        // 2. Llamamos a la pasarela
+        // 2) llamo a la pasarela
         HttpEntity<?> entity = new HttpEntity<>(buildBody(pedido, pago), buildHeaders());
         ResponseEntity<String> response = rest.exchange(
                 pasarelaUrl + "/init", HttpMethod.POST, entity, String.class);
@@ -55,39 +65,47 @@ public class PagoService {
         pago.setPasarelaPayload(response.getBody());
         pagoRepo.save(pago);
 
-        // 3. Respuesta al front: URL a la que debe redirigirse
+        // 3) construyo respuesta
         String redirect = extractRedirectUrl(response.getBody());
-        return new PagoController.PagoInitResponse(redirect, pago.getId().toString());
+        return new PagoInitResponse(redirect, pago.getId().toString());
     }
 
-    /** Paso 2: confirmación desde la pasarela */
-    public void processCallback(PagoController.PasarelaCallback cb) {
+    public void processCallback(PasarelaCallback cb) {
         Pago pago = pagoRepo.findByPasarelaId(cb.transaccionId())
                 .orElseThrow(() -> new EntityNotFoundException("Pago no encontrado"));
-
         pago.actualizarEstado(cb.status());
         pagoRepo.save(pago);
     }
 
-    /* -- helpers privados -- */
-    private Map<String, Object> buildBody(Pedido pedido, Pago pago) {
+    /* ---------- HELPERS PRIVADOS ---------- */
+
+    private HttpHeaders buildHeaders() {
+        HttpHeaders h = new HttpHeaders();
+        h.setContentType(MediaType.APPLICATION_JSON);
+        return h;
+    }
+
+    private Map<String,Object> buildBody(Pedido pedido, Pago pago) {
         return Map.of(
-                "amount",          pago.getMonto(),
-                "currency",        "MXN",
-                "orderId",         pedido.getId(),
-                "transactionId",   pago.getId(),
-                "callbackUrl",     "https://tu-dominio.com/api/pagos/confirmacion"
+                "amount",        pago.getMonto(),
+                "currency",      "MXN",
+                "orderId",       pedido.getId(),
+                "transactionId", pago.getId(),
+                "callbackUrl",   "https://tu-dominio.com/api/pagos/confirmacion"
         );
     }
+
     private String extractRedirectUrl(String bodyJson) {
-        /* parsea JSON */
         try {
-            com.fasterxml.jackson.databind.JsonNode node =
-                    new com.fasterxml.jackson.databind.ObjectMapper()
-                            .readTree(bodyJson);
+            var node = new com.fasterxml.jackson.databind.ObjectMapper()
+                    .readTree(bodyJson);
             return node.path("redirect").asText();
         } catch (Exception e) {
-            return "";  // o lanza tu propia excepción
+            throw new RuntimeException("Error parseando redirect de pasarela", e);
         }
     }
+
+    // DTOs anidados o importa de tu PagoController
+    public record PagoInitResponse(String redirectUrl, String pagoId) {}
+    public record PasarelaCallback(String transaccionId, String status) {}
 }

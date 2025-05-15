@@ -13,4 +13,20 @@ public class Role {
 
     @Column(nullable = false, unique = true, length = 30)
     private String nombre;               // ADMIN, CLIENTE, etc.
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 }

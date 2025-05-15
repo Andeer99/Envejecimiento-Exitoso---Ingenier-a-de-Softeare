@@ -1,14 +1,21 @@
 package com.IngdeSoftware.EnvejecimientoExitoso.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "usuarios")
+@Getter @Setter
 public class Usuario {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private String nombre;
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -16,36 +23,58 @@ public class Usuario {
     @Column(nullable = false)
     private String password;
 
-    /* === roles almacenados como cadenas: ADMIN, CLIENTE, … === */
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "usuarios_roles",
             joinColumns = @JoinColumn(name = "usuario_id"))
     @Column(name = "role")
-    private Set<String> roles;
+    private Set<String> roles = new HashSet<>();
 
-    /* ----------  MÉTODO HELPER NUEVO  ---------- */
-    /** Devuelve el primer rol o «CLIENTE» si el set está vacío */
+    /* ===== helper para no romper el JWT ===== */
     public String getMainRole() {
-        return roles == null || roles.isEmpty()
-                ? "CLIENTE"
-                : roles.iterator().next();
+        return roles.stream().findFirst().orElse("CLIENTE");
     }
 
-    /* (opcional) helper para añadir un rol sin exponer el set */
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Set<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<String> roles) {
+        this.roles = roles;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
     public void addRole(String role) {
-        roles.add(role);
+        this.roles.add(role);
     }
-
-    /* ----------  getters / setters  ---------- */
-    public Long getId()          { return id; }
-    public void setId(Long id)   { this.id = id; }
-
-    public String getEmail()     { return email; }
-    public void setEmail(String email) { this.email = email; }
-
-    public String getPassword()  { return password; }
-    public void setPassword(String pw) { this.password = pw; }
-
-    public Set<String> getRoles()            { return roles; }
-    public void setRoles(Set<String> roles)  { this.roles = roles; }
 }

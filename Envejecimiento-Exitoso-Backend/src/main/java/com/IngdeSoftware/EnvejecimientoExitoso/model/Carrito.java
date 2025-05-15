@@ -39,6 +39,30 @@ public class Carrito {
     public void vaciar() { items.clear(); }
     public boolean isEmpty() { return items.isEmpty(); }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public List<CarritoItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<CarritoItem> items) {
+        this.items = items;
+    }
+
     @Transient
     public BigDecimal getTotal() {
         return items.stream()

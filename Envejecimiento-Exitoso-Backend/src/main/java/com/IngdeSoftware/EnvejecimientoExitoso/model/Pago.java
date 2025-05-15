@@ -28,6 +28,62 @@ public class Pago {
 
     private LocalDateTime fecha = LocalDateTime.now();
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public LocalDateTime getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(LocalDateTime fecha) {
+        this.fecha = fecha;
+    }
+
+    public String getPasarelaPayload() {
+        return pasarelaPayload;
+    }
+
+    public void setPasarelaPayload(String pasarelaPayload) {
+        this.pasarelaPayload = pasarelaPayload;
+    }
+
+    public String getPasarelaId() {
+        return pasarelaId;
+    }
+
+    public void setPasarelaId(String pasarelaId) {
+        this.pasarelaId = pasarelaId;
+    }
+
+    public BigDecimal getMonto() {
+        return monto;
+    }
+
+    public void setMonto(BigDecimal monto) {
+        this.monto = monto;
+    }
+
+    public Pedido getPedido() {
+        return pedido;
+    }
+
+    public void setPedido(Pedido pedido) {
+        this.pedido = pedido;
+    }
+
+    public EstadoPago getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoPago estado) {
+        this.estado = estado;
+    }
+
     /* ------------- helpers de dominio ------------- */
     public static Pago fromPedido(Pedido p) {
         Pago pago = new Pago();

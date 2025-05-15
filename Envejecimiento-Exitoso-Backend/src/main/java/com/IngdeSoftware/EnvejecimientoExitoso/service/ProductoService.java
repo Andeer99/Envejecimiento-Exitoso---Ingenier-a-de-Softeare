@@ -1,5 +1,6 @@
 package com.IngdeSoftware.EnvejecimientoExitoso.service;
-import com.IngdeSoftware.EnvejecimientoExitoso.dto.producto.ProductoDTO;
+import com.IngdeSoftware.EnvejecimientoExitoso.dto.producto.ProductoCreateDTO;
+import com.IngdeSoftware.EnvejecimientoExitoso.dto.producto.ProductoResponseDTO;
 import com.IngdeSoftware.EnvejecimientoExitoso.mapper.ProductoMapper;
 import com.IngdeSoftware.EnvejecimientoExitoso.model.Producto;
 import jakarta.persistence.EntityNotFoundException;
@@ -12,22 +13,27 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
+
 @Transactional
 public class ProductoService {
 
     private final ProductoRepository repo;
     private final ProductoMapper mapper;
 
-    public List<ProductoDTO> findAllDTO() {
+    public ProductoService(ProductoRepository repo, ProductoMapper mapper) {
+        this.repo = repo;
+        this.mapper = mapper;
+    }
+
+    public List<ProductoResponseDTO> findAllDTO() {
         return repo.findAll().stream().map(mapper::toDto).toList();
     }
 
-    public ProductoDTO findDTOById(Long id) {
+    public ProductoResponseDTO findDTOById(Long id) {
         return mapper.toDto(buscar(id));
     }
 
-    public ProductoDTO save(ProductoDTO dto) {
+    public ProductoResponseDTO save(ProductoCreateDTO dto) {
         Producto entity = mapper.toEntity(dto);
         return mapper.toDto(repo.save(entity));
     }

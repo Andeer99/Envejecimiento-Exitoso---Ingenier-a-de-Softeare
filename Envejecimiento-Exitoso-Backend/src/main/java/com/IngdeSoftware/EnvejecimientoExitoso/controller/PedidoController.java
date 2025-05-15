@@ -4,7 +4,7 @@ package com.IngdeSoftware.EnvejecimientoExitoso.controller;
 import com.IngdeSoftware.EnvejecimientoExitoso.dto.pedido.PedidoDTO;
 import com.IngdeSoftware.EnvejecimientoExitoso.service.PedidoService;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
+import org.springframework.security.core.Authentication;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +16,10 @@ import java.util.List;
 public class PedidoController {
 
     private final PedidoService service;
+
+    public PedidoController(PedidoService service) {
+        this.service = service;
+    }
 
     /** Crear pedido a partir del carrito del usuario */
     @PostMapping

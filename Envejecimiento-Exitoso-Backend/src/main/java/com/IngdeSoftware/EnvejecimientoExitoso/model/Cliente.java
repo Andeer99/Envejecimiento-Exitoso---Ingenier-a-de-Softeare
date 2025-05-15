@@ -21,6 +21,14 @@ public class Cliente extends Usuario {
     /*  --- constructores auxiliares ---  */
     public Cliente() { }
 
+    public String getRfc() {
+        return rfc;
+    }
+
+    public void setRfc(String rfc) {
+        this.rfc = rfc;
+    }
+
     public Cliente(String rfc) {
         this.rfc = rfc;
     }

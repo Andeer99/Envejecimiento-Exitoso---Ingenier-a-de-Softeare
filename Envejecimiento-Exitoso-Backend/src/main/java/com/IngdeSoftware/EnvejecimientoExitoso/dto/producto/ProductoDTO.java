@@ -9,4 +9,8 @@ public record ProductoDTO(
         BigDecimal precio,
         Integer    stock,
         String     categoria
-) {}
+) {
+    public void setId(Long id) {
+
+    }
+}

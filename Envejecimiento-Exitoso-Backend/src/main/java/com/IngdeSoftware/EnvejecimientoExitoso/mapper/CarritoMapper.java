@@ -5,9 +5,11 @@ import com.IngdeSoftware.EnvejecimientoExitoso.dto.carrito.CarritoItemDTO;
 import com.IngdeSoftware.EnvejecimientoExitoso.model.Carrito;
 import com.IngdeSoftware.EnvejecimientoExitoso.model.CarritoItem;
 import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
+
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy= ReportingPolicy.IGNORE)
 public interface CarritoMapper {
 
     CarritoDTO toDto(Carrito carrito);

@@ -14,11 +14,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service @RequiredArgsConstructor @Transactional
+@Service  @Transactional
 public class CarritoService {
 
     private final CarritoRepository carritoRepo;
     private final UsuarioRepository usuarioRepo;
+
+    public CarritoService(CarritoRepository carritoRepo, UsuarioRepository usuarioRepo, ProductoRepository productoRepo, CarritoMapper mapper) {
+        this.carritoRepo = carritoRepo;
+        this.usuarioRepo = usuarioRepo;
+        this.productoRepo = productoRepo;
+        this.mapper = mapper;
+    }
+
     private final ProductoRepository productoRepo;
     private final CarritoMapper mapper;
 
@@ -33,7 +41,15 @@ public class CarritoService {
                     return carritoRepo.save(nuevo);
                 });
     }
+    /** Devuelve la entidad Carrito, creándola si no existe */
+    public Carrito fetchOrCreateCartEntity(String email) {
+        return fetchOrCreateCart(email);  // tu método privado existente
+    }
 
+    /** Persiste un carrito (útil tras vaciarlo) */
+    public Carrito saveCarrito(Carrito carrito) {
+        return carritoRepo.save(carrito);
+    }
     /** Ver carrito */
     public CarritoDTO getCart(String email) {
         Carrito carrito = fetchOrCreateCart(email);

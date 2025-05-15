@@ -1,9 +1,8 @@
 package com.IngdeSoftware.EnvejecimientoExitoso.dto.cliente;
 
-public record ClienteDTO(
+public record ClienteResponseDTO(
         Long   id,
         String nombreCompleto,
-        String password,
         String email,
         String rfc
 ) {}
