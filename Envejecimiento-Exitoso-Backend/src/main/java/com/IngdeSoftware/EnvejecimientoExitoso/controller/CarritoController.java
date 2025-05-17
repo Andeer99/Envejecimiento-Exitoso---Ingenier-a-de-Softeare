@@ -1,7 +1,6 @@
 package com.IngdeSoftware.EnvejecimientoExitoso.controller;
 
 import com.IngdeSoftware.EnvejecimientoExitoso.dto.carrito.CarritoDTO;
-import com.IngdeSoftware.EnvejecimientoExitoso.dto.carrito.CarritoItemCreateDTO;
 import com.IngdeSoftware.EnvejecimientoExitoso.dto.carrito.CarritoItemDTO;
 import com.IngdeSoftware.EnvejecimientoExitoso.service.CarritoService;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +33,7 @@ public class CarritoController {
     /** Añadir producto al carrito */
     @PostMapping("/items")
     @ResponseStatus(HttpStatus.CREATED)
-    public CarritoDTO addItem(
-            @Valid @RequestBody CarritoItemCreateDTO item,
+    public CarritoDTO addItem(@Valid @RequestBody CarritoItemDTO item,
                               Authentication auth) {
         return service.addItem(auth.getName(), item);
     }

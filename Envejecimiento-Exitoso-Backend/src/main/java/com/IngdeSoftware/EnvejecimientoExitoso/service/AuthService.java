@@ -19,7 +19,6 @@ public class AuthService {
     private final AuthenticationManager    authManager;
     private final JwtUtil                  jwtUtil;
     private final UsuarioRepository        repo;
-    private final UsuarioDetailsService    uds;
 
     public AuthService(AuthenticationManager authManager, JwtUtil jwtUtil, UsuarioRepository repo, UsuarioDetailsService uds) {
         this.authManager = authManager;
@@ -27,6 +26,8 @@ public class AuthService {
         this.repo = repo;
         this.uds = uds;
     }
+
+    private final UsuarioDetailsService    uds;
 
     public AuthResponse authenticate(LoginRequest req) {
         // 1) Autenticar credenciales
