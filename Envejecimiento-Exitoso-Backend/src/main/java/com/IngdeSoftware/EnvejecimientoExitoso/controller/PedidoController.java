@@ -40,4 +40,12 @@ public class PedidoController {
     public PedidoDTO detalle(@PathVariable Long id) {
         return service.findByIdDTO(id);
     }
+    /** Cancela (no borra) un pedido cambiando su estado a CANCELADO */
+    @PutMapping("/{id}/cancelar")
+    @PreAuthorize("hasRole('CLIENTE')")
+    @ResponseStatus(HttpStatus.OK)
+    public PedidoDTO cancelarPedido(@PathVariable Long id, Authentication auth) {
+        // opcional: validar que auth.getName() sea el propietario
+        return service.cancelarPedido(id, auth.getName());
+    }
 }

@@ -3,6 +3,7 @@ package com.IngdeSoftware.EnvejecimientoExitoso.service;
 import com.IngdeSoftware.EnvejecimientoExitoso.dto.pedido.PedidoDTO;
 import com.IngdeSoftware.EnvejecimientoExitoso.mapper.PedidoMapper;
 import com.IngdeSoftware.EnvejecimientoExitoso.model.Carrito;
+import com.IngdeSoftware.EnvejecimientoExitoso.model.EstadoPedido;
 import com.IngdeSoftware.EnvejecimientoExitoso.model.Pedido;
 import com.IngdeSoftware.EnvejecimientoExitoso.repository.PedidoRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -55,4 +56,16 @@ public class PedidoService {
                 .orElseThrow(() -> new EntityNotFoundException("Pedido no existe"));
         return mapper.toDto(p);
     }
+    @Transactional
+    public PedidoDTO cancelarPedido(Long id, String username) {
+        Pedido pedido = repo.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Pedido no existe"));
+        // opcional: checar que pedido.getUser().equals(username)
+
+        pedido.setEstado(EstadoPedido.CANCELADO);
+        repo.save(pedido);
+
+        return mapper.toDto(pedido);
+    }
+
 }
