@@ -10,85 +10,94 @@ import java.util.List;
 
 @Entity
 @Table(name = "pedidos")
-@Getter @Setter @NoArgsConstructor
+@NoArgsConstructor
 public class Pedido {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "usuario_id")
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id")
     private Usuario usuario;
 
     private LocalDateTime fecha = LocalDateTime.now();
 
-    public EstadoPedido getEstado() {
-        return estado;
-    }
+    @Enumerated(EnumType.STRING)
+    private EstadoPedido estado = EstadoPedido.NUEVO;
 
-    public void setEstado(EstadoPedido estado) {
-        this.estado = estado;
-    }
+    @OneToMany(mappedBy = "pedido",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private List<PedidoItem> items = new ArrayList<>();
 
-    public BigDecimal getTotal() {
-        return total;
-    }
+    private BigDecimal total;
 
-    public void setTotal(BigDecimal total) {
-        this.total = total;
-    }
+    /* === getters y setters explícitos === */
 
-    public List<PedidoItem> getItems() {
-        return items;
+    public Long getId() {
+        return id;
     }
-
-    public void setItems(List<PedidoItem> items) {
-        this.items = items;
-    }
-
-    public LocalDateTime getFecha() {
-        return fecha;
-    }
-
-    public void setFecha(LocalDateTime fecha) {
-        this.fecha = fecha;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Usuario getUsuario() {
         return usuario;
     }
-
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
     }
 
-    public Long getId() {
-        return id;
+    public LocalDateTime getFecha() {
+        return fecha;
+    }
+    public void setFecha(LocalDateTime fecha) {
+        this.fecha = fecha;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public EstadoPedido getEstado() {
+        return estado;
+    }
+    public void setEstado(EstadoPedido estado) {
+        this.estado = estado;
     }
 
-    @Enumerated(EnumType.STRING)
-    private EstadoPedido estado = EstadoPedido.NUEVO;
+    public List<PedidoItem> getItems() {
+        return items;
+    }
+    public void setItems(List<PedidoItem> items) {
+        this.items = items;
+    }
 
-    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PedidoItem> items = new ArrayList<>();
-
-    private BigDecimal total;
+    public BigDecimal getTotal() {
+        return total;
+    }
+    public void setTotal(BigDecimal total) {
+        this.total = total;
+    }
 
     /* -------  Fábrica desde Carrito  ------- */
     public static Pedido crearDesdeCarrito(Carrito carrito) {
         Pedido p = new Pedido();
         p.usuario = carrito.getUsuario();
         carrito.getItems().forEach(ci ->
-                p.items.add(new PedidoItem(p, ci.getProducto(), ci.getCantidad(), ci.getPrecioUnitario()))
+                p.items.add(new PedidoItem(
+                        p,
+                        ci.getProducto(),
+                        ci.getCantidad(),
+                        ci.getPrecioUnitario()
+                ))
         );
         p.calcularTotal();
         return p;
     }
+
     private void calcularTotal() {
-        total = items.stream()
+        this.total = items.stream()
                 .map(PedidoItem::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
