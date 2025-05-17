@@ -23,7 +23,7 @@ public class Pago {
     private EstadoPago estado = EstadoPago.PENDIENTE;
 
     /* id devuelto por la pasarela externa */
-    @Column(unique = true, length = 64)
+    @Column(name= "pasarela_id", unique = true, length = 64)
     private String pasarelaId;
 
     private LocalDateTime fecha = LocalDateTime.now();

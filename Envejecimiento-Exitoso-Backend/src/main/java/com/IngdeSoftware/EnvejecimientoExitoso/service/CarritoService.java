@@ -1,7 +1,7 @@
 package com.IngdeSoftware.EnvejecimientoExitoso.service;
 
 import com.IngdeSoftware.EnvejecimientoExitoso.dto.carrito.CarritoDTO;
-import com.IngdeSoftware.EnvejecimientoExitoso.dto.carrito.CarritoItemDTO;
+import com.IngdeSoftware.EnvejecimientoExitoso.dto.carrito.CarritoItemCreateDTO;
 import com.IngdeSoftware.EnvejecimientoExitoso.mapper.CarritoMapper;
 import com.IngdeSoftware.EnvejecimientoExitoso.model.Carrito;
 import com.IngdeSoftware.EnvejecimientoExitoso.model.Producto;
@@ -10,79 +10,73 @@ import com.IngdeSoftware.EnvejecimientoExitoso.repository.CarritoRepository;
 import com.IngdeSoftware.EnvejecimientoExitoso.repository.ProductoRepository;
 import com.IngdeSoftware.EnvejecimientoExitoso.repository.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service  @Transactional
+@Service
+@Transactional
 public class CarritoService {
 
-    private final CarritoRepository carritoRepo;
-    private final UsuarioRepository usuarioRepo;
+    private final CarritoRepository  carritoRepo;
+    private final UsuarioRepository  usuarioRepo;
+    private final ProductoRepository productoRepo;
+    private final CarritoMapper      mapper;
 
-    public CarritoService(CarritoRepository carritoRepo, UsuarioRepository usuarioRepo, ProductoRepository productoRepo, CarritoMapper mapper) {
-        this.carritoRepo = carritoRepo;
-        this.usuarioRepo = usuarioRepo;
+    public CarritoService(CarritoRepository carritoRepo,
+                          UsuarioRepository usuarioRepo,
+                          ProductoRepository productoRepo,
+                          CarritoMapper mapper) {
+        this.carritoRepo  = carritoRepo;
+        this.usuarioRepo  = usuarioRepo;
         this.productoRepo = productoRepo;
-        this.mapper = mapper;
+        this.mapper       = mapper;
     }
 
-    private final ProductoRepository productoRepo;
-    private final CarritoMapper mapper;
-
-    /** Obtener o crear carrito */
+    /* ---------- helpers ---------- */
     private Carrito fetchOrCreateCart(String email) {
-        Usuario usuario = usuarioRepo.findByEmail(email)
+        Usuario u = usuarioRepo.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+
         return carritoRepo.findByUsuarioEmail(email)
                 .orElseGet(() -> {
-                    Carrito nuevo = new Carrito();
-                    nuevo.setUsuario(usuario);
-                    return carritoRepo.save(nuevo);
+                    Carrito c = new Carrito();
+                    c.setUsuario(u);
+                    return carritoRepo.save(c);
                 });
     }
-    /** Devuelve la entidad Carrito, creándola si no existe */
-    public Carrito fetchOrCreateCartEntity(String email) {
-        return fetchOrCreateCart(email);  // tu método privado existente
-    }
 
-    /** Persiste un carrito (útil tras vaciarlo) */
-    public Carrito saveCarrito(Carrito carrito) {
-        return carritoRepo.save(carrito);
-    }
-    /** Ver carrito */
+    /* ---------- API ---------- */
     public CarritoDTO getCart(String email) {
-        Carrito carrito = fetchOrCreateCart(email);
-        return mapper.toDto(carrito);
+        return mapper.toDto(fetchOrCreateCart(email));
     }
 
-    /** Añadir ítem */
-    public CarritoDTO addItem(String email, CarritoItemDTO itemDto) {
-        Carrito carrito = fetchOrCreateCart(email);
-        Producto producto = productoRepo.findById(itemDto.productoId())
+    public CarritoDTO addItem(String email, CarritoItemCreateDTO dto) {
+        Carrito c = fetchOrCreateCart(email);
+        Producto p = productoRepo.findById(dto.productoId())
                 .orElseThrow(() -> new EntityNotFoundException("Producto no existe"));
-        carrito.agregar(producto, itemDto.cantidad());
-        return mapper.toDto(carritoRepo.save(carrito));
+        c.agregar(p, dto.cantidad());
+        return mapper.toDto(carritoRepo.save(c));
     }
 
-    /** Actualizar cantidad */
     public CarritoDTO updateItem(String email, Long itemId, int cantidad) {
-        Carrito carrito = fetchOrCreateCart(email);
-        carrito.actualizarCantidad(itemId, cantidad);
-        return mapper.toDto(carritoRepo.save(carrito));
+        Carrito c = fetchOrCreateCart(email);
+        c.actualizarCantidad(itemId, cantidad);
+        return mapper.toDto(carritoRepo.save(c));
     }
 
-    /** Eliminar ítem */
     public void removeItem(String email, Long itemId) {
-        Carrito carrito = fetchOrCreateCart(email);
-        carrito.eliminarItem(itemId);
-        carritoRepo.save(carrito);
+        Carrito c = fetchOrCreateCart(email);
+        c.eliminarItem(itemId);
+        carritoRepo.save(c);
     }
 
-    /** Vaciar carrito */
     public void clear(String email) {
-        Carrito carrito = fetchOrCreateCart(email);
-        carrito.vaciar();
-        carritoRepo.save(carrito);
+        Carrito c = fetchOrCreateCart(email);
+        c.vaciar();
+        carritoRepo.save(c);
     }
+
+    /* Expuesto para PedidoService */
+    public Carrito fetchEntity(String email)          { return fetchOrCreateCart(email); }
+    public Carrito saveEntity(Carrito carrito)        { return carritoRepo.save(carrito); }
 }

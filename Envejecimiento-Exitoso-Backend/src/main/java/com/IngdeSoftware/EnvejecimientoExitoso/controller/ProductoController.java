@@ -1,11 +1,10 @@
+// src/main/java/com/IngdeSoftware/EnvejecimientoExitoso/controller/ProductoController.java
 package com.IngdeSoftware.EnvejecimientoExitoso.controller;
 
 import com.IngdeSoftware.EnvejecimientoExitoso.dto.producto.ProductoCreateDTO;
-import com.IngdeSoftware.EnvejecimientoExitoso.dto.producto.ProductoDTO;
 import com.IngdeSoftware.EnvejecimientoExitoso.dto.producto.ProductoResponseDTO;
 import com.IngdeSoftware.EnvejecimientoExitoso.service.ProductoService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -14,44 +13,48 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/productos")
-@CrossOrigin(origins = "*")
 public class ProductoController {
+
+    private final ProductoService service;
 
     public ProductoController(ProductoService service) {
         this.service = service;
     }
 
-    private final ProductoService service;
-
-    @GetMapping
-    public List<ProductoResponseDTO> listar() {                         // catálogo completo
-        return service.findAllDTO();
+    /** 1) Crear producto (solo ADMIN) */
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ProductoResponseDTO crear(@RequestBody @Valid ProductoCreateDTO dto) {
+        return service.create(dto);
     }
 
+    /** 2) Listar todos (cualquiera) */
+    @GetMapping
+    public List<ProductoResponseDTO> listar() {
+        return service.findAll();
+    }
+
+    /** 3) Obtener por id (cualquiera) */
     @GetMapping("/{id}")
     public ProductoResponseDTO detalle(@PathVariable Long id) {
-        return service.findDTOById(id);
+        return service.findByIdDTO(id);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public ProductoResponseDTO crear(@Valid @RequestBody ProductoCreateDTO dto) {
-        return service.save(dto);
-    }
-/*
-    @PreAuthorize("hasRole('ADMIN')")
+    /** 4) Actualizar producto (solo ADMIN) */
     @PutMapping("/{id}")
-    public ProductoResponseDTO actualizar(@PathVariable Long id,
-                                  @Valid @RequestBody ProductoDTO dto) {
-        dto.setId(id);
-        return service.save(dto);
-    }
-*/
     @PreAuthorize("hasRole('ADMIN')")
+    public ProductoResponseDTO actualizar(
+            @PathVariable Long id,
+            @RequestBody @Valid ProductoCreateDTO dto) {
+        return service.update(id, dto);
+    }
+
+    /** 5) Eliminar producto (solo ADMIN) */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void eliminar(@PathVariable Long id) {
-        service.deleteById(id);
+        service.delete(id);
     }
 }

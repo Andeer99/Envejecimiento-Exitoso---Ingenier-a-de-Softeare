@@ -1,32 +1,43 @@
+// src/main/java/com/IngdeSoftware/EnvejecimientoExitoso/mapper/ProductoMapper.java
 package com.IngdeSoftware.EnvejecimientoExitoso.mapper;
 
 import com.IngdeSoftware.EnvejecimientoExitoso.dto.producto.ProductoCreateDTO;
-import com.IngdeSoftware.EnvejecimientoExitoso.dto.producto.ProductoDTO;
 import com.IngdeSoftware.EnvejecimientoExitoso.dto.producto.ProductoResponseDTO;
 import com.IngdeSoftware.EnvejecimientoExitoso.model.Producto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.factory.Mappers;
 
-import java.util.List;
-
-@Mapper(componentModel = "spring", unmappedTargetPolicy= ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring")
 public interface ProductoMapper {
-    // 1) CREATE: ignoro id (autogenerado)
-    @Mapping(target="id",        ignore = true)
-    @Mapping(target="nombre",    source = "nombre")
-    @Mapping(target="descripcion",source = "descripcion")
-    @Mapping(target="precio",    source = "precio")
-    @Mapping(target="stock",     source = "stock")
-    @Mapping(target="categoria", source = "categoria")
-    Producto toEntity(ProductoCreateDTO dto);
 
-    // 2) READ: entity → response
-    @Mapping(target="id",         source = "id")
-    @Mapping(target="nombre",     source = "nombre")
-    @Mapping(target="descripcion",source = "descripcion")
-    @Mapping(target="precio",     source = "precio")
-    @Mapping(target="stock",      source = "stock")
-    @Mapping(target="categoria",  source = "categoria")
-    ProductoResponseDTO toDto(Producto entity);
+    ProductoMapper INSTANCE = Mappers.getMapper(ProductoMapper.class);
+
+    // --- Entidad → DTO ---
+    @Mapping(source = "id",          target = "id")
+    @Mapping(source = "nombre",      target = "nombre")
+    @Mapping(source = "descripcion", target = "descripcion")
+    @Mapping(source = "precio",      target = "precio")
+    @Mapping(source = "stock",       target = "stock")
+    @Mapping(source = "categoria",   target = "categoria")
+    ProductoResponseDTO toDto(Producto producto);
+
+    // --- DTO → Entidad (para creación) ---
+    @Mapping(target = "id",           ignore = true) // no inyectamos id al crear
+    @Mapping(source = "nombre",       target = "nombre")
+    @Mapping(source = "descripcion",  target = "descripcion")
+    @Mapping(source = "precio",       target = "precio")
+    @Mapping(source = "stock",        target = "stock")
+    @Mapping(source = "categoria",    target = "categoria")
+    Producto toEntity(ProductoCreateDTO createDTO);
+
+    // --- DTO → Entidad (para actualización in-place) ---
+    @Mapping(target = "id",           ignore = true) // mantenemos el id original
+    @Mapping(source = "nombre",       target = "nombre")
+    @Mapping(source = "descripcion",  target = "descripcion")
+    @Mapping(source = "precio",       target = "precio")
+    @Mapping(source = "stock",        target = "stock")
+    @Mapping(source = "categoria",    target = "categoria")
+    void updateEntity(ProductoCreateDTO dto, @MappingTarget Producto entity);
 }

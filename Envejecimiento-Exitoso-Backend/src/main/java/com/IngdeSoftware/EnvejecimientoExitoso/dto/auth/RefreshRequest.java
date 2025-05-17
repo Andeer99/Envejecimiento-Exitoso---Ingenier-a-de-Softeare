@@ -1,4 +1,7 @@
 package com.IngdeSoftware.EnvejecimientoExitoso.dto.auth;
 
-/** Petición de renovación de token */
-public record RefreshRequest(String refreshToken) {}
+import jakarta.validation.constraints.NotBlank;
+
+public record RefreshRequest(
+        @NotBlank String refreshToken
+) {}

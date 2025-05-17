@@ -7,8 +7,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
+    // Para initPayment / createOrder:
+    Optional<Pedido> findByIdAndUsuarioEmail(Long id, String usuarioEmail);
 
-    List<Pedido> findByUsuarioEmail(String email);
-
-    Optional<Pedido> findByIdAndUsuarioEmail(Long id, String email);
+    // Para listar pedidos de un cliente:
+    List<Pedido> findByUsuarioEmailOrderByFechaDesc(String usuarioEmail);
 }

@@ -1,9 +1,11 @@
 package com.IngdeSoftware.EnvejecimientoExitoso.service;
 
 import com.IngdeSoftware.EnvejecimientoExitoso.repository.UsuarioRepository;
-import org.springframework.security.core.userdetails.*;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import com.IngdeSoftware.EnvejecimientoExitoso.model.Usuario;
 
 @Service
 public class UsuarioDetailsService implements UserDetailsService {
@@ -16,12 +18,12 @@ public class UsuarioDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Usuario u = repo.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("No existe: " + email));
-        return User.builder()
-                .username(u.getEmail())
-                .password(u.getPassword())
-                .roles(u.getRoles().toArray(new String[0]))
-                .build();
+
+        return repo.findByEmail(email)
+                .map(u -> User.withUsername(u.getEmail())
+                        .password(u.getPassword())
+                        .roles(u.getRoles().toArray(new String[0]))
+                        .build())
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
     }
 }

@@ -16,7 +16,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -24,7 +23,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-
     public SecurityConfig(UsuarioDetailsService uds, PasswordEncoder encoder, JwtAuthFilter jwtFilter) {
         this.uds = uds;
         this.encoder = encoder;
@@ -32,61 +30,58 @@ public class SecurityConfig {
     }
 
     private final UsuarioDetailsService uds;
-    private final PasswordEncoder encoder;
-    private final JwtAuthFilter jwtFilter;
+    private final PasswordEncoder       encoder;
+    private final JwtAuthFilter         jwtFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
-                                           AuthenticationManager authManager) throws Exception {
+                                           AuthenticationManager authMgr) throws Exception {
         http
-
-                // 1) JWT stateless → no sesiones, CSRF off
+                // 1) Stateless, disable CSRF
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(sm ->
+                        sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // 2) Errores JSON en vez de página de login Spring
+                // 2) JSON error responses
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(restAuthenticationEntryPoint())
                         .accessDeniedHandler((req, res, e) -> {
                             res.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                        res.setContentType("application/json");
-                        res.getWriter().write("{\"error\":\"Acceso Denegado\"}");})
+                            res.setContentType("application/json");
+                            res.getWriter().write("{\"error\":\"Acceso denegado\"}");
+                        })
                 )
 
-                // 3) Configuración de rutas públicas y protegidas
+                // 3) Route authorization
                 .authorizeHttpRequests(auth -> auth
-                        // LOGIN y REFRESHTOKEN
+                        // login / refresh
                         .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
-
-                        // REGISTRO de clientes
-                        .requestMatchers(HttpMethod.POST, "/api/clientes", "/api/clientes/", "/api/clientes/**").permitAll()
-
-                        // Catálogo público de productos
+                        // register cliente
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/clientes",
+                                "/api/clientes/**").permitAll()
+                        // public catalog
                         .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
-
-                        // Archivos estáticos / páginas sueltas
-                        .requestMatchers("/", "/css/**", "/js/**", "/login.html", "/registro.html")
-                        .permitAll()
-
-                        // Todo lo demás requiere JWT válido
+                        // error path
+                        .requestMatchers("/error").permitAll()
+                        // static resources
+                        .requestMatchers("/", "/css/**", "/js/**").permitAll()
+                        // all others need authentication
                         .anyRequest().authenticated()
-
                 )
 
-                // 4) Provider y filtro JWT
-                .authenticationProvider(authProvider())
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-        ;
+                // 4) authentication provider + JWT filter
+                .authenticationProvider(daoAuthProvider())
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
     @Bean
-    public DaoAuthenticationProvider authProvider() {
+    public DaoAuthenticationProvider daoAuthProvider() {
         DaoAuthenticationProvider p = new DaoAuthenticationProvider();
         p.setPasswordEncoder(encoder);
         p.setUserDetailsService(uds);
-
         return p;
     }
 
@@ -95,21 +90,11 @@ public class SecurityConfig {
         return cfg.getAuthenticationManager();
     }
 
-    /** Devuelve 401 con JSON en lugar de redirect a login form */
     private AuthenticationEntryPoint restAuthenticationEntryPoint() {
         return (req, res, ex) -> {
-            res.setContentType("application/json");
             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            res.getWriter().write("{\"error\":\"No autorizado\"}");
-        };
-    }
-
-    /** Devuelve 403 con JSON en caso de acceso denegado */
-    private AccessDeniedHandler restAccessDeniedHandler() {
-        return (req, res, ex) -> {
             res.setContentType("application/json");
-            res.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            res.getWriter().write("{\"error\":\"Acceso denegado\"}");
+            res.getWriter().write("{\"error\":\"No autorizado\"}");
         };
     }
 }

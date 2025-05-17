@@ -6,7 +6,6 @@ import com.IngdeSoftware.EnvejecimientoExitoso.model.Carrito;
 import com.IngdeSoftware.EnvejecimientoExitoso.model.Pedido;
 import com.IngdeSoftware.EnvejecimientoExitoso.repository.PedidoRepository;
 import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,46 +15,44 @@ import java.util.List;
 @Transactional
 public class PedidoService {
 
-    private final PedidoRepository pedidoRepo;
-    private final CarritoService carritoService;    // ➜ inyecta tu CarritoService
-    private final PedidoMapper mapper;
+    private final PedidoRepository repo;
+    private final PedidoMapper     mapper;
+    private final CarritoService   carritoService;
 
-    public PedidoService(PedidoRepository pedidoRepo, PedidoMapper mapper, CarritoService carritoService) {
-        this.pedidoRepo = pedidoRepo;
-        this.mapper = mapper;
-        this.carritoService = carritoService;
+    public PedidoService(PedidoRepository repo,
+                         PedidoMapper mapper,
+                         CarritoService carritoService) {
+        this.repo            = repo;
+        this.mapper          = mapper;
+        this.carritoService  = carritoService;
     }
 
-    /** Crea pedido a partir del carrito, limpia el carrito y calcula totales */
+    /* ---------- Crear pedido desde carrito ---------- */
     public PedidoDTO createOrder(String email) {
-        // 1) Obtiene la entidad Carrito (no el DTO)
-        Carrito carrito = carritoService.fetchOrCreateCartEntity(email);
 
-        // 2) Valida que no esté vacío
-        if (carrito.isEmpty()) {
-            throw new IllegalStateException("Carrito vacío");
-        }
+        Carrito carrito = carritoService.fetchEntity(email);
 
-        // 3) Construye el Pedido desde el Carrito
+        if (carrito.getItems().isEmpty())
+            throw new IllegalStateException("El carrito está vacío");
+
         Pedido pedido = Pedido.crearDesdeCarrito(carrito);
+        Pedido saved  = repo.save(pedido);
 
-        // 4) Vacía el carrito (usa el método de la entidad)
+        // vaciamos el carrito
         carrito.vaciar();
-        carritoService.saveCarrito(carrito);         // o carritoService.clear(email)
+        carritoService.saveEntity(carrito);
 
-        // 5) Persiste el pedido y retorna DTO
-        return mapper.toDto(pedidoRepo.save(pedido));
+        return mapper.toDto(saved);
     }
 
+    /* ---------- Consultas ---------- */
     public List<PedidoDTO> findOrdersByUser(String email) {
-        return pedidoRepo.findByUsuarioEmail(email).stream()
-                .map(mapper::toDto)
-                .toList();
+        return mapper.toDto(repo.findByUsuarioEmailOrderByFechaDesc(email));
     }
 
     public PedidoDTO findByIdDTO(Long id) {
-        return pedidoRepo.findById(id)
-                .map(mapper::toDto)
+        Pedido p = repo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Pedido no existe"));
+        return mapper.toDto(p);
     }
 }

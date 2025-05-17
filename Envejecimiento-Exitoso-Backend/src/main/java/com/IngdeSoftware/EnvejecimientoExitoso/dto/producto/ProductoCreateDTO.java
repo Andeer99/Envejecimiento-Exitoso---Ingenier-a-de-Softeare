@@ -1,11 +1,12 @@
 package com.IngdeSoftware.EnvejecimientoExitoso.dto.producto;
 
+import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 
 public record ProductoCreateDTO(
-        String nombre,
-        String descripcion,
-        BigDecimal precio,
-        int stock,
-        String categoria
+        @NotBlank           String     nombre,
+        @Size(max = 255)    String     descripcion,
+        @DecimalMin("0.0")  BigDecimal precio,
+        @Min(0)             Integer    stock,
+        @Size(max = 50)     String     categoria
 ) {}
