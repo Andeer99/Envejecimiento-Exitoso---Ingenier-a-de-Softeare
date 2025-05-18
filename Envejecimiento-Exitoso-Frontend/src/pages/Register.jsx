@@ -1,52 +1,140 @@
-// src/pages/Register.jsx
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 export default function Register() {
-  const [email, setEmail]       = useState('')
-  const [password, setPassword] = useState('')
   const navigate = useNavigate()
-  const apiBase = import.meta.env.PROD
-    ? 'https://envejecimiento-exitoso-production.up.railway.app/auth'
-    : 'http://localhost:8080/auth'
+  const [form, setForm] = useState({
+    nombre: "", email: "", password: "",
+    confirmPassword: "", direccion: "", telefono: ""
+  })
 
-  async function onSubmit(e) {
+  function handleChange(e) {
+    setForm({ ...form, [e.target.name]: e.target.value })
+  }
+
+  function handleSubmit(e) {
     e.preventDefault()
-    const res = await fetch(`${apiBase}/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    })
-    if (res.ok) {
-      alert('Usuario registrado, por favor haz login')
-      navigate('/login')
-    } else {
-      alert('Error al registrar')
+    if (form.password !== form.confirmPassword) {
+      alert("Las contraseñas no coinciden.")
+      return
     }
+    // Aquí conectarías con el backend de registro...
+    alert("¡Registro simulado exitoso! Redirigiendo a login")
+    navigate("/login")
   }
 
   return (
-    <main>
-      <h1>Registrar</h1>
-      <form onSubmit={onSubmit}>
-        <label>
-          Email:
-          <input 
-            type="email" 
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            required />
-        </label>
-        <label>
-          Contraseña:
-          <input 
+    <div style={{
+      maxWidth: 390, margin: "56px auto", padding: "34px 26px",
+      background: "#fff", borderRadius: 15, boxShadow: "0 2px 14px #0001"
+    }}>
+      <h2 style={{ textAlign: "center", fontWeight: 800, marginBottom: 24 }}>Registro</h2>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label style={{ fontWeight: 600 }}>Nombre Completo</label>
+          <input
+            type="text"
+            name="nombre"
+            value={form.nombre}
+            onChange={handleChange}
+            placeholder="Tu nombre completo"
+            style={{
+              width: "100%", marginBottom: 10, padding: "9px 7px",
+              borderRadius: 5, border: "1.5px solid #e0e5f3", fontSize: 15
+            }}
+            required
+          />
+        </div>
+        <div>
+          <label style={{ fontWeight: 600 }}>Correo Electrónico</label>
+          <input
+            type="email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            placeholder="ejemplo@dominio.com"
+            style={{
+              width: "100%", marginBottom: 10, padding: "9px 7px",
+              borderRadius: 5, border: "1.5px solid #e0e5f3", fontSize: 15
+            }}
+            required
+          />
+        </div>
+        <div>
+          <label style={{ fontWeight: 600 }}>Contraseña</label>
+          <input
             type="password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            required />
-        </label>
-        <button type="submit">Registrar</button>
+            name="password"
+            value={form.password}
+            onChange={handleChange}
+            style={{
+              width: "100%", marginBottom: 10, padding: "9px 7px",
+              borderRadius: 5, border: "1.5px solid #e0e5f3", fontSize: 15
+            }}
+            required
+          />
+        </div>
+        <div>
+          <label style={{ fontWeight: 600 }}>Confirmar Contraseña</label>
+          <input
+            type="password"
+            name="confirmPassword"
+            value={form.confirmPassword}
+            onChange={handleChange}
+            style={{
+              width: "100%", marginBottom: 10, padding: "9px 7px",
+              borderRadius: 5, border: "1.5px solid #e0e5f3", fontSize: 15
+            }}
+            required
+          />
+        </div>
+        <div>
+          <label style={{ fontWeight: 600 }}>Dirección</label>
+          <input
+            type="text"
+            name="direccion"
+            value={form.direccion}
+            onChange={handleChange}
+            placeholder="Tu dirección"
+            style={{
+              width: "100%", marginBottom: 10, padding: "9px 7px",
+              borderRadius: 5, border: "1.5px solid #e0e5f3", fontSize: 15
+            }}
+            required
+          />
+        </div>
+        <div>
+          <label style={{ fontWeight: 600 }}>Teléfono</label>
+          <input
+            type="tel"
+            name="telefono"
+            value={form.telefono}
+            onChange={handleChange}
+            placeholder="Número de teléfono"
+            style={{
+              width: "100%", marginBottom: 18, padding: "9px 7px",
+              borderRadius: 5, border: "1.5px solid #e0e5f3", fontSize: 15
+            }}
+            required
+          />
+        </div>
+        <button
+          type="submit"
+          style={{
+            width: "100%", background: "#2385e6", color: "#fff",
+            fontWeight: 700, border: "none", borderRadius: 5,
+            padding: "12px 0", fontSize: 17, cursor: "pointer"
+          }}
+        >
+          Registrar
+        </button>
+        <div style={{ marginTop: 10, textAlign: "center" }}>
+          <a href="#" style={{ color: "#2976e0", fontSize: 15, textDecoration: "underline" }}
+            onClick={e => { e.preventDefault(); navigate("/login") }}>
+            ¿Ya tienes cuenta? Inicia sesión
+          </a>
+        </div>
       </form>
-    </main>
+    </div>
   )
 }

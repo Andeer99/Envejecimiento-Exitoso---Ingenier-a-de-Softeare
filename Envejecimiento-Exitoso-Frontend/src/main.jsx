@@ -3,7 +3,8 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
-
+import { CartProvider  } from './context/CartContext'
+ 
 // ----------------------------------------
 //      IMPORT STYLES
 // ----------------------------------------
@@ -17,9 +18,11 @@ import './css/confirm.css';
 
 // monta la app con la función importada
 createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+<React.StrictMode>
     <BrowserRouter>
-      <App />
+      <CartProvider>
+        <App />
+      </CartProvider>
     </BrowserRouter>
   </React.StrictMode>
 )
