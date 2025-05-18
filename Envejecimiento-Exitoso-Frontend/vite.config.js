@@ -1,39 +1,36 @@
 // vite.config.js
 import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
 
 export default defineConfig({
-  // 1) Raíz del front
-  root: 'src',
-  base: './',
-  publicDir: false,
-  build: {
-    // Al nivel de tu carpeta de front:
-    outDir: resolve(__dirname, 'dist'),
-    emptyOutDir: true,
+  // 1) Carpeta raíz de tu código fuente
+  root: resolve(__dirname, 'src'),
 
-    // 5) Multi-page: explícito cada HTML de entrada
-    rollupOptions: {
-      input: {
-        index:    resolve(__dirname, 'src/index.html'),
-        login:    resolve(__dirname, 'src/login.html'),
-        catalog:  resolve(__dirname, 'src/catalog.html'),
-        cart:     resolve(__dirname, 'src/cart.html'),
-        confirm:  resolve(__dirname, 'src/confirm.html'),
-        registro: resolve(__dirname, 'src/registro.html'),
-        payment:  resolve(__dirname, 'src/payment.html'),
-      },
-       output: {
-    entryFileNames:  'js/[name].js',
-    chunkFileNames:  'js/[name]-[hash].js',
-    assetFileNames: assetInfo => {
-      if (assetInfo.name.endsWith('.css')) return 'css/[name].css'
-      return 'assets/[name][extname]'
-    }
+  // 2) Para que Vite deje la caché fuera de node_modules
+  cacheDir: resolve(__dirname, '.vite'),
+
+  // 3) URL base en producción
+  base: '/',
+
+  // 4) Dev server
+  server: {
+    port: 3000,
+    // evita problemas de OneDrive locking
+    fs: {
+      strict: false
     }
   },
 
-  server: {
-    port: 3000
-  }
-}})
+  // 5) Build output
+  build: {
+    outDir: resolve(__dirname, 'dist'),
+    emptyOutDir: true,
+    sourcemap: true, // opcional
+  },
+
+  // 6) Plugins
+  plugins: [
+    react()
+  ]
+})
