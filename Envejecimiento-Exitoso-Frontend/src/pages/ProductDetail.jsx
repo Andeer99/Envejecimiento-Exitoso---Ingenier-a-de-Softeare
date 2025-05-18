@@ -7,18 +7,16 @@ import '../css/style.css'
 const MOCK_PRODUCTS = [
   {
     id: 1,
-    nombreProducto: "Gold Standard Whey",
-    imagenUrl: "https://i.imgur.com/ChFqjYB.jpg",
-    precioUnitario: 1599,
-    precioAnterior: 2244.99,
-    descripcion: "Suplemento en polvo Optimum Nutrition Proteína sabor mocha cappuccino x 2.27kg. 28% de descuento, envío gratis y pago a meses.",
+    nombreProducto: "Producto 1",
+    imagenUrl: "https://picsum.photos/seed/producto1/250/150",
+    precioUnitario: 29.99,
+    descripcion: "Ejemplo de producto, descripción breve.",
   },
   {
     id: 2,
     nombreProducto: "Producto 2",
     imagenUrl: "https://picsum.photos/seed/producto2/300/250",
-    precioUnitario: 999,
-    precioAnterior: 1100,
+    precioUnitario: 39.99,
     descripcion: "Ejemplo de producto, descripción breve.",
   }
 ]
