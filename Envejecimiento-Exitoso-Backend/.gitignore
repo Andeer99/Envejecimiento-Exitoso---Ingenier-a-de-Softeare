@@ -18,6 +18,9 @@ target/
 *.iws
 *.iml
 *.ipr
+# No subir credenciales ni configuración local
+/src/main/resources/application.properties
+
 
 ### NetBeans ###
 /nbproject/private/
