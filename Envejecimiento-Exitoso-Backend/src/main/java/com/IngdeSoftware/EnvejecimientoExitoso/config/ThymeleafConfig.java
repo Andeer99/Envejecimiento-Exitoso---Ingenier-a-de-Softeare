@@ -2,22 +2,18 @@ package com.IngdeSoftware.EnvejecimientoExitoso.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver;
-import org.thymeleaf.spring6.view.ThymeleafViewResolver;
+import org.thymeleaf.templatemode.TemplateMode;
 
 @Configuration
 public class ThymeleafConfig {
-
     @Bean
-    public SpringResourceTemplateResolver templateResolver() {
+    public SpringResourceTemplateResolver thymeleafTemplateResolver() {
         SpringResourceTemplateResolver resolver = new SpringResourceTemplateResolver();
-        // 👉 Apunta al dist donde está tu front rebuildable
-        resolver.setPrefix("file:C:/Users/alexa/OneDrive/Escritorio/Ing de software/Envejecimiento-Exitoso-Frontend/dist/");
+        resolver.setPrefix("classpath:/templates/"); // carpeta /resources/templates/
         resolver.setSuffix(".html");
-        resolver.setTemplateMode("HTML");
-        resolver.setCacheable(false); // para ver cambios sin reiniciar
+        resolver.setTemplateMode(TemplateMode.HTML);
+        resolver.setCacheable(false);
         return resolver;
     }
-
 }
