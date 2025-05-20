@@ -6,10 +6,7 @@ export default function Catalog() {
   const [items, setItems] = useState([])
 
   useEffect(() => {
-    const apiBase = import.meta.env.PROD
-      ? 'https://envejecimiento-exitoso-production.up.railway.app/api'
-      : 'http://localhost:8080/api'
-
+    const apiBase = import.meta.env.VITE_API_URL;
     fetch(`${apiBase}/productos`)
       .then(r => r.json())
       .then(setItems)
