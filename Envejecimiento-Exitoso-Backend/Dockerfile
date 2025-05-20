@@ -6,7 +6,7 @@ ENTRYPOINT ["top", "-b"]
 # Etapa de build
 FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /app
-COPY . .
+COPY target .
 RUN sed -i 's/\r$//' mvnw && chmod +x mvnw
 RUN ./mvnw clean package -DskipTests=true
 
