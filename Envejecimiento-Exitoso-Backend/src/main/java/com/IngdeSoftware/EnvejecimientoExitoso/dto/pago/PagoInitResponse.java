@@ -1,6 +1,9 @@
 package com.IngdeSoftware.EnvejecimientoExitoso.dto.pago;
 
+/**
+ * DTO que tu servicio devuelve al frontend tras iniciar el pago
+ */
 public record PagoInitResponse(
-        String urlRedirect,
-        String transaccionId
+        Long pagoId,
+        String redirectUrl
 ) {}
