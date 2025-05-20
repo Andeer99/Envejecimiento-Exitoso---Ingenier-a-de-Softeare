@@ -1,47 +1,36 @@
-// src/components/LoginModal.jsx
 import React, { useState } from 'react'
 
 export default function LoginModal({ onClose }) {
-  const [email, setEmail]       = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const apiBase = import.meta.env.PROD
-    ? 'https://envejecimiento-exitoso-production.up.railway.app/auth'
-    : 'http://localhost:8080/auth'
+  const [error, setError] = useState('')
 
   function handleLogin(e) {
     e.preventDefault()
-    fetch(`${apiBase}/login`, {
+    fetch(`${import.meta.env.VITE_API_URL.replace(/\/api$/, "")}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
     })
       .then(r => r.json())
-      .then(({ accessToken, refreshToken }) => {
-        localStorage.setItem('accessToken', accessToken)
-        localStorage.setItem('refreshToken', refreshToken)
-        onClose()
+      .then(({ accessToken }) => {
+        if (accessToken) {
+          localStorage.setItem('accessToken', accessToken)
+          onClose()
+        } else {
+          setError('Credenciales inválidas')
+        }
       })
-      .catch(() => alert('Credenciales inválidas'))
+      .catch(() => setError('Error en el servidor'))
   }
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <form className="modal" onClick={e => e.stopPropagation()} onSubmit={handleLogin}>
         <h2>Iniciar Sesión</h2>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          required
-        />
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+        <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
+        <input type="password" placeholder="Contraseña" value={password} onChange={e => setPassword(e.target.value)} required />
         <button type="submit">Entrar</button>
       </form>
     </div>

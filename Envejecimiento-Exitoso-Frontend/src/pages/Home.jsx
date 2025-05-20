@@ -9,10 +9,7 @@ export default function Home() {
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
 
-  const apiBase = import.meta.env.PROD
-    ? 'https://envejecimiento-exitoso-production.up.railway.app/api'
-    : 'http://localhost:8080/api'
-
+  const apiBase = import.meta.env.VITE_API_URL;
   useEffect(() => {
     fetch(`${apiBase}/productos?page=${page}&size=6`)
       .then(res => res.json())

@@ -7,11 +7,34 @@ export default function Login() {
   const [password, setPassword] = useState("")
 
   function handleSubmit(e) {
-    e.preventDefault()
-    // Aquí conectarías con el backend de login...
-    alert("Inicio de sesión simulado. ¡Redirigiendo al home!")
-    navigate("/")
+  e.preventDefault();
+  if (form.password !== form.confirmPassword) {
+    alert("Las contraseñas no coinciden.");
+    return;
   }
+  fetch(`${import.meta.env.VITE_API_URL}/clientes`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      nombre: form.nombre,
+      email: form.email,
+      password: form.password,
+      direccion: form.direccion,
+      telefono: form.telefono,
+      // Otros campos según tu DTO...
+    })
+  })
+    .then(res => {
+      if (!res.ok) throw new Error("Registro fallido");
+      return res.json();
+    })
+    .then(data => {
+      alert("¡Registro exitoso!");
+      navigate("/login");
+    })
+    .catch(() => alert("Error al registrar usuario"));
+}
+
 
   return (
     <div style={{

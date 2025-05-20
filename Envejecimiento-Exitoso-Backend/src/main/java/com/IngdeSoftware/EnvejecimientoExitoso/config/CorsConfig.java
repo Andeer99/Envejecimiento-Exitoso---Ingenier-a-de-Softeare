@@ -13,18 +13,16 @@ public class CorsConfig {
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        // Permite dominios de tu frontend (Railway y local)
         config.setAllowedOrigins(List.of(
-                "https://envejecimiento-exitoso-production.up.railway.app",
+                "https://envejecimientoexitosofrontend-production.up.railway.app",
                 "http://localhost:5173"
         ));
-        config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
         config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        // Aplica a todas las rutas del backend
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
