@@ -1,80 +1,96 @@
 package com.IngdeSoftware.EnvejecimientoExitoso.service;
 
+import com.IngdeSoftware.EnvejecimientoExitoso.model.Role;
+import com.IngdeSoftware.EnvejecimientoExitoso.model.RoleName;
 import com.IngdeSoftware.EnvejecimientoExitoso.model.Usuario;
+import com.IngdeSoftware.EnvejecimientoExitoso.repository.RoleRepository;
 import com.IngdeSoftware.EnvejecimientoExitoso.repository.UsuarioRepository;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class UsuarioService {
 
     private final UsuarioRepository repo;
-    private final PasswordEncoder encoder;
+    private final RoleRepository    roleRepo;
+    private final PasswordEncoder   encoder;
 
-    public UsuarioService(UsuarioRepository repo,
-                          PasswordEncoder encoder) {
-        this.repo = repo;
-        this.encoder = encoder;
-    }
+    /* ---------- CRUD genérico ---------- */
 
-    /**
-     * Devuelve todos los usuarios.
-     */
     public List<Usuario> findAll() {
         return repo.findAll();
     }
 
-    /**
-     * Busca un usuario por su ID o lanza excepción si no existe.
-     */
     public Usuario findById(Long id) {
         return repo.findById(id)
-                .orElseThrow(() ->
-                        new IllegalArgumentException("Usuario no encontrado: " + id)
-                );
+                .orElseThrow(() -> new EntityNotFoundException("Usuario id = " + id + " no existe"));
     }
 
-    /**
-     * Busca un usuario por su email o lanza excepción si no existe.
-     */
     public Usuario findByEmail(String email) {
         return repo.findByEmail(email)
-                .orElseThrow(() ->
-                        new IllegalArgumentException("Usuario no encontrado: " + email)
-                );
+                .orElseThrow(() -> new EntityNotFoundException("Usuario email = " + email + " no existe"));
     }
 
-    /**
-     * Crea o actualiza un usuario.
-     * - En creación: siempre encripta la contraseña.
-     * - En edición: si no llega nueva contraseña, conserva la anterior.
-     */
-    public Usuario save(Usuario usuario) {
-        if (usuario.getId() != null) {
-            // Edición: obtenemos el existente para conservar contraseña si no cambia
-            Usuario existente = findById(usuario.getId());
-            if (usuario.getPassword() == null || usuario.getPassword().isBlank()) {
-                usuario.setPassword(existente.getPassword());
-            } else {
-                usuario.setPassword(encoder.encode(usuario.getPassword()));
-            }
-        } else {
-            // Creación: encriptamos siempre
-            usuario.setPassword(encoder.encode(usuario.getPassword()));
-        }
-        return repo.save(usuario);
-    }
-
-    /**
-     * Elimina un usuario por ID.
-     */
     public void deleteById(Long id) {
-        // opcional: verificar existencia antes de borrar
-        if (!repo.existsById(id)) {
-            throw new IllegalArgumentException("No existe usuario con ID: " + id);
-        }
+        if (!repo.existsById(id))
+            throw new EntityNotFoundException("Usuario id = " + id + " no existe");
         repo.deleteById(id);
+    }
+
+    /* ---------- Alta con rol predeterminado ---------- */
+
+    /**
+     * Crea un nuevo cliente.
+     */
+    public Usuario createCliente(Usuario usuario) {
+        return createWithRole(usuario, RoleName.CLIENTE);
+    }
+
+    /**
+     * Crea un nuevo administrador.
+     *  – Puedes añadir más lógica (p.ej. verificación de cuenta) si lo necesitas.
+     */
+    public Usuario createAdmin(Usuario usuario) {
+        return createWithRole(usuario, RoleName.ADMIN);
+    }
+
+    /* ---------- Actualización ---------- */
+
+    /**
+     * Actualiza un usuario existente.
+     *  – Si llega nueva contraseña, la encripta; si no, conserva la anterior.
+     *  – Los roles no se tocan aquí (gestión aparte).
+     */
+    public Usuario update(Long id, Usuario cambios) {
+        Usuario existente = findById(id);
+
+        existente.setNombre( cambios.getNombre() );
+        existente.setEmail(  cambios.getEmail() );
+
+        if (cambios.getPassword() != null && !cambios.getPassword().isBlank()) {
+            existente.setPassword( encoder.encode(cambios.getPassword()) );
+        }
+
+        return repo.save(existente);
+    }
+
+    /* ---------- Helpers ---------- */
+
+    private Usuario createWithRole(Usuario usuario, RoleName roleName) {
+        usuario.setPassword( encoder.encode(usuario.getPassword()) );
+
+        Role rol = roleRepo.findByName(roleName)
+                .orElseThrow(() -> new IllegalStateException(
+                        "Rol " + roleName + " no existe. ¿Seed ejecutado?"));
+
+        usuario.addRole(rol);
+        return repo.save(usuario);
     }
 }

@@ -18,11 +18,10 @@ public class UsuarioDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-
         return repo.findByEmail(email)
                 .map(u -> User.withUsername(u.getEmail())
                         .password(u.getPassword())
-                        .roles(u.getRoles().toArray(new String[0]))
+                        .authorities(u.getRoles())    // cada Role ya es GrantedAuthority
                         .build())
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
     }

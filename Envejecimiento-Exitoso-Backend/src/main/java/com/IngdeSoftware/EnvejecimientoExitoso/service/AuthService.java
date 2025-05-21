@@ -3,31 +3,25 @@ package com.IngdeSoftware.EnvejecimientoExitoso.service;
 import com.IngdeSoftware.EnvejecimientoExitoso.dto.auth.AuthResponse;
 import com.IngdeSoftware.EnvejecimientoExitoso.dto.auth.LoginRequest;
 import com.IngdeSoftware.EnvejecimientoExitoso.dto.auth.RefreshRequest;
+import com.IngdeSoftware.EnvejecimientoExitoso.model.Role;
+import com.IngdeSoftware.EnvejecimientoExitoso.model.RoleName;
 import com.IngdeSoftware.EnvejecimientoExitoso.model.Usuario;
 import com.IngdeSoftware.EnvejecimientoExitoso.repository.UsuarioRepository;
 import com.IngdeSoftware.EnvejecimientoExitoso.security.JwtUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
     private final AuthenticationManager authManager;
     private final JwtUtil               jwtUtil;
     private final UsuarioRepository     usuarioRepo;
     private final UsuarioDetailsService uds;
-
-    public AuthService(AuthenticationManager authManager,
-                       JwtUtil jwtUtil,
-                       UsuarioRepository usuarioRepo,
-                       UsuarioDetailsService uds) {
-        this.authManager  = authManager;
-        this.jwtUtil      = jwtUtil;
-        this.usuarioRepo  = usuarioRepo;
-        this.uds          = uds;
-    }
 
     /* ---------- Login ---------- */
     public AuthResponse authenticate(LoginRequest req) {
@@ -43,7 +37,7 @@ public class AuthService {
         Usuario u = usuarioRepo.findByEmail(req.email())
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no existe"));
 
-        return new AuthResponse(access, refresh, u.getMainRole());
+        return new AuthResponse(access, refresh, resolveMainRole(u).name());
     }
 
     /* ---------- Refresh ---------- */
@@ -61,6 +55,21 @@ public class AuthService {
         Usuario u = usuarioRepo.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no existe"));
 
-        return new AuthResponse(access, refresh, u.getMainRole());
+        return new AuthResponse(access, refresh, resolveMainRole(u).name());
+    }
+
+    /* ---------- Helper ---------- */
+    /**
+     * Devuelve el rol “principal” de un usuario.
+     *  - Prioriza ADMIN; si no, regresa el primero encontrado o CLIENTE por defecto.
+     */
+    private RoleName resolveMainRole(Usuario u) {
+        return u.getRoles().stream()
+                .map(Role::getName)                 // RoleName
+                .sorted((a, b) ->                  // ADMIN primero
+                        a == RoleName.ADMIN ? -1 :
+                                b == RoleName.ADMIN ?  1 : 0)
+                .findFirst()
+                .orElse(RoleName.CLIENTE);
     }
 }

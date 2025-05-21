@@ -2,52 +2,61 @@ package com.IngdeSoftware.EnvejecimientoExitoso.controller;
 
 import com.IngdeSoftware.EnvejecimientoExitoso.model.Usuario;
 import com.IngdeSoftware.EnvejecimientoExitoso.service.UsuarioService;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
-@RequestMapping("/usuarios")
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/usuarios")
+@RequiredArgsConstructor
 public class UsuarioController {
 
-    private final UsuarioService service;
+    private final UsuarioService usuarioService;
 
-    public UsuarioController(UsuarioService service) {
-        this.service = service;
+    /* ---------- Crear cliente ---------- */
+    @PostMapping("/cliente")
+    public ResponseEntity<Usuario> crearCliente(@Valid @RequestBody Usuario usuario) {
+        Usuario creado = usuarioService.createCliente(usuario);
+        return new ResponseEntity<>(creado, HttpStatus.CREATED);
     }
 
-    // 1) Listado de usuarios
+    /* ---------- Crear administrador ---------- */
+    @PreAuthorize("hasRole('ADMIN')")          // solo un admin puede crear otros admins
+    @PostMapping("/admin")
+    public ResponseEntity<Usuario> crearAdmin(@Valid @RequestBody Usuario usuario) {
+        Usuario creado = usuarioService.createAdmin(usuario);
+        return new ResponseEntity<>(creado, HttpStatus.CREATED);
+    }
+
+    /* ---------- Listar todos ---------- */
     @GetMapping
-    public String list(Model model) {
-        model.addAttribute("usuarios", service.findAll());
-        return "user-list";     // dist/user-list.html
+    public List<Usuario> findAll() {
+        return usuarioService.findAll();
     }
 
-    // 2) Formulario para crear uno nuevo
-    @GetMapping("/nuevo")
-    public String nuevo(Model model) {
-        model.addAttribute("usuario", new Usuario());
-        return "user-form";     // dist/user-form.html
+    /* ---------- Obtener uno ---------- */
+    @GetMapping("/{id}")
+    public Usuario findById(@PathVariable Long id) {
+        return usuarioService.findById(id);
     }
 
-    // 3) Guardar (POST tanto para nuevo como edición)
-    @PostMapping
-    public String guardar(@ModelAttribute Usuario usuario) {
-        service.save(usuario);
-        return "redirect:/usuarios";
+    /* ---------- Actualizar ---------- */
+    @PutMapping("/{id}")
+    public Usuario update(@PathVariable Long id,
+                          @Valid @RequestBody Usuario cambios) {
+        return usuarioService.update(id, cambios);
     }
 
-    // 4) Editar existente
-    @GetMapping("/editar/{id}")
-    public String editar(@PathVariable Long id, Model model) {
-        model.addAttribute("usuario", service.findById(id));
-        return "user-form";
-    }
-
-    // 5) Eliminar
-    @GetMapping("/eliminar/{id}")
-    public String eliminar(@PathVariable Long id) {
-        service.deleteById(id);
-        return "redirect:/usuarios";
+    /* ---------- Eliminar ---------- */
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")         // protege la eliminación
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        usuarioService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

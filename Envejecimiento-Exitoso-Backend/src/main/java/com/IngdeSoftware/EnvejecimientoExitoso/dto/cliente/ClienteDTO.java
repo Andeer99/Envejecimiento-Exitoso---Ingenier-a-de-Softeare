@@ -1,6 +1,7 @@
 package com.IngdeSoftware.EnvejecimientoExitoso.dto.cliente;
 
-public record ClienteDTO(
+public record
+ClienteDTO(
         Long   id,
         String nombreCompleto,
         String password,

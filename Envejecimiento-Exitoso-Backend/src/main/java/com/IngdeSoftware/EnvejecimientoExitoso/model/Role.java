@@ -2,31 +2,23 @@ package com.IngdeSoftware.EnvejecimientoExitoso.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
 
 @Entity
 @Table(name = "roles")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
-public class Role {
+public class Role implements GrantedAuthority {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 30)
-    private String nombre;               // ADMIN, CLIENTE, etc.
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, unique = true, length = 20)
+    private RoleName name;      // CLIENTE  |  ADMIN
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    /* ----- Spring Security ----- */
+    @Override
+    public String getAuthority() {          // ROLE_CLIENTE, ROLE_ADMIN
+        return "ROLE_" + name.name();
     }
 }
