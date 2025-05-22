@@ -12,7 +12,7 @@ export default function Login() {
     alert("Las contraseñas no coinciden.");
     return;
   }
-  fetch(`${import.meta.env.VITE_API_URL}/clientes`, {
+  fetch(`${import.meta.env.VITE_API_URL}/api/clientes`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

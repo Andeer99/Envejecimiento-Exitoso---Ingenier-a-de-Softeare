@@ -20,7 +20,7 @@ export default function ProductDetail() {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`${apiBase}/productos/${id}`)
+    fetch(`${apiBase}/api/productos/${id}`)
       .then(res => {
         if (!res.ok) throw new Error(`Producto ${id} no encontrado`);
         return res.json();

@@ -11,21 +11,14 @@ export default function Home() {
 
   const apiBase = import.meta.env.VITE_API_URL;
   useEffect(() => {
-    fetch(`${apiBase}/productos?page=${page}&size=6`)
+    fetch(`${apiBase}/api/productos?page=${page}&size=6`)
       .then(res => res.json())
       .then(data => {
         setProducts(data.content || data)
         setTotalPages(data.totalPages || 1)
       })
       .catch(() => {
-        setProducts([
-          { id: 1, nombreProducto: 'Producto 1', precioUnitario: 29.99, imagenUrl: 'https://picsum.photos/seed/producto1/250/150' },
-          { id: 2, nombreProducto: 'Producto 2', precioUnitario: 39.99, imagenUrl: 'https://picsum.photos/seed/producto2/250/150' },
-          { id: 3, nombreProducto: 'Producto 3', precioUnitario: 19.99, imagenUrl: 'https://picsum.photos/seed/producto3/250/150' },
-          { id: 4, nombreProducto: 'Producto 4', precioUnitario: 49.99, imagenUrl: 'https://picsum.photos/seed/producto4/250/150' },
-          { id: 5, nombreProducto: 'Producto 5', precioUnitario: 59.99, imagenUrl: 'https://picsum.photos/seed/producto5/250/150' },
-          { id: 6, nombreProducto: 'Producto 6', precioUnitario: 24.99, imagenUrl: 'https://picsum.photos/seed/producto6/250/150' }
-        ])
+        setProducts([])
         setTotalPages(1)
       })
   }, [page])

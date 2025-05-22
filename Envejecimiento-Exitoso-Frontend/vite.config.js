@@ -5,10 +5,10 @@ import { resolve } from 'path'
 
 export default defineConfig({
   // 1) Carpeta raíz de tu código fuente
-  root: resolve(__dirname, 'src'),
-
+  //root: resolve(__dirname, 'src'),
+  root: 'src',
   // 2) Para que Vite deje la caché fuera de node_modules
-  cacheDir: resolve(__dirname, '.vite'),
+  //cacheDir: resolve(__dirnSame, '.vite'),
 
   // 3) URL base en producción
   base: '/',

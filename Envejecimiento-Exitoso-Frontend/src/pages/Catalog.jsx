@@ -7,12 +7,16 @@ export default function Catalog() {
 
   useEffect(() => {
     const apiBase = import.meta.env.VITE_API_URL;
-    fetch(`${apiBase}/productos`)
+    fetch(`${apiBase}/api/productos`)
       .then(r => r.json())
-      .then(setItems)
+      .then(data => {
+        setItems(data);
+        console.log("Productos recibidos", data);
+      })
       .catch(console.error)
   }, [])
-
+  console.log(items);
+  
   return (
     <main>
       <h1>Catálogo de Productos</h1>
@@ -22,7 +26,7 @@ export default function Catalog() {
             <img src={p.imagenUrl} alt={p.nombreProducto} />
             <h2>{p.nombreProducto}</h2>
             <div>${p.precioUnitario.toFixed(2)}</div>
-            <Link to={`/product/${p.id}`}>Ver detalle</Link>
+            <Link to={`/producto/${p.id}`}>Ver detalle</Link>
           </div>
         ))}
       </section>
