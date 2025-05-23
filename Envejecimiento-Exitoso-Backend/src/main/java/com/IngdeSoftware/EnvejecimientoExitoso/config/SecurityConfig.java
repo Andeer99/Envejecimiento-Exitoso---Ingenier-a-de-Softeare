@@ -62,17 +62,21 @@ public class SecurityConfig {
 
                 // 4) Reglas de autorización
                 .authorizeHttpRequests(auth -> auth
-                        // Permitir todas las pre-flight OPTIONS
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        // login / refresh en /api/auth/**
+                        .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
 
-                        // Rutas públicas de autenticación
-                        .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/clientes", "/api/clientes/**").permitAll()
-                        .requestMatchers(HttpMethod.GET,  "/api/productos/**").permitAll()
-                        .requestMatchers("/error").permitAll()
-                        .requestMatchers("/", "/css/**", "/js/**").permitAll()
+                        // register cliente
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/clientes",
+                                "/api/clientes/**").permitAll()
 
-                        // Cualquier otra ruta requiere autenticación
+                        // catálogo público
+                        .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
+
+                        // recursos estáticos y error
+                        .requestMatchers("/", "/css/**", "/js/**", "/error").permitAll()
+
+                        // demás rutas requieren autenticación
                         .anyRequest().authenticated()
                 )
 
