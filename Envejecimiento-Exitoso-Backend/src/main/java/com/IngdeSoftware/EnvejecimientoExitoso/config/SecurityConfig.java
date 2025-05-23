@@ -63,7 +63,7 @@ public class SecurityConfig {
                 // 4) Reglas de autorización
                 .authorizeHttpRequests(auth -> auth
                         // login / refresh en /api/auth/**
-                        .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
 
                         // register cliente
                         .requestMatchers(HttpMethod.POST,

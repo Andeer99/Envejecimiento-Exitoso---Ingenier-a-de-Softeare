@@ -25,7 +25,7 @@ export default function SidebarAuth({ open, onClose }) {
   const handleLogin = async e => {
     e.preventDefault(); setLoading(true); setError('');
     try {
-      const res = await fetch(`${API}/api/auth/login`, {
+      const res = await fetch(`${API}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(loginData),
@@ -50,13 +50,7 @@ export default function SidebarAuth({ open, onClose }) {
       const res = await fetch(`${API}/api/clientes`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nombreCompleto: registerData.nombre,
-          email:          registerData.email,
-          password:       registerData.password,
-          direccion:      registerData.direccion,
-          telefono:       registerData.telefono,
-        })
+        body: JSON.stringify({ email, password})
       });
       if (!res.ok) throw new Error('Email ya registrado o datos inválidos');
       alert('Registro exitoso - inicia sesión');
