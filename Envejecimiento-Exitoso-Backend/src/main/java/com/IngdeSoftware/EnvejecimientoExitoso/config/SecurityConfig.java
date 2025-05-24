@@ -4,8 +4,6 @@ import com.IngdeSoftware.EnvejecimientoExitoso.service.UsuarioDetailsService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -33,19 +31,19 @@ public class SecurityConfig {
     public SecurityConfig(UsuarioDetailsService uds,
                           PasswordEncoder encoder,
                           JwtAuthFilter jwtFilter) {
-        this.uds = uds;
-        this.encoder = encoder;
+        this.uds       = uds;
+        this.encoder   = encoder;
         this.jwtFilter = jwtFilter;
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // 1) Habilitar CORS + desactivar CSRF
+                // 1) Habilitar CORS y desactivar CSRF
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
 
-                // 2) Stateless session
+                // 2) Sesión sin estado
                 .sessionManagement(sm ->
                         sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
@@ -62,25 +60,29 @@ public class SecurityConfig {
 
                 // 4) Reglas de autorización
                 .authorizeHttpRequests(auth -> auth
-                        // login / refresh en /api/auth/**
+                        // Permitir TODOS los pre-flight OPTIONS
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // Endpoints de autenticación bajo /auth/**
                         .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
 
-                        // register cliente
-                        .requestMatchers(HttpMethod.POST,
-                                "/api/clientes",
-                                "/api/clientes/**").permitAll()
+                        // Registro de clientes
+                        .requestMatchers(HttpMethod.POST, "/api/clientes", "/api/clientes/**")
+                        .permitAll()
 
-                        // catálogo público
-                        .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
+                        // Consulta pública de productos
+                        .requestMatchers(HttpMethod.GET, "/api/productos/**")
+                        .permitAll()
 
-                        // recursos estáticos y error
-                        .requestMatchers("/", "/css/**", "/js/**", "/error").permitAll()
+                        // Recursos estáticos y error
+                        .requestMatchers("/", "/css/**", "/js/**", "/error")
+                        .permitAll()
 
-                        // demás rutas requieren autenticación
+                        // Resto requieren autenticación
                         .anyRequest().authenticated()
                 )
 
-                // 5) Proveedor de autenticación + filtro JWT
+                // 5) Proveedor de autenticación y filtro JWT
                 .authenticationProvider(daoAuthProvider())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -89,7 +91,7 @@ public class SecurityConfig {
 
     @Bean
     public DaoAuthenticationProvider daoAuthProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        var provider = new DaoAuthenticationProvider();
         provider.setPasswordEncoder(encoder);
         provider.setUserDetailsService(uds);
         return provider;
