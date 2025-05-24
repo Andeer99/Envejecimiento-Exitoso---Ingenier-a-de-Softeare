@@ -31,8 +31,8 @@ export default function Cart() {
         <tbody>
           {cart.map(item => (
             <tr key={item.id}>
-              <td><img src={item.imagenUrl} alt={item.nombreProducto} width={48} /></td>
-              <td>{item.nombreProducto}</td>
+              <td><img src={item.imageUrl} alt={item.nombre} width={48} /></td>
+              <td>{item.nombre}</td>
               <td>
                 <input
                   type="number"
@@ -42,15 +42,14 @@ export default function Cart() {
                   style={{ width: 48, textAlign: "center" }}
                 />
               </td>
-              <td>${(item.precioUnitario || 0).toFixed(2)}</td>
-              <td>${((item.precioUnitario || 0) * (item.cantidad || 0)).toFixed(2)}</td>
+              <td>${(item.precio || 0).toFixed(2)}</td>
+              <td>${((item.precio || 0) * (item.cantidad || 0)).toFixed(2)}</td>
               <td>
                 <button
                   style={{
                     background: "#ee433c", color: "#fff", border: "none", borderRadius: 4, padding: "6px 14px", cursor: "pointer"
                   }}
-                  onClick={() => removeFromCart(item.id)}
-                >Eliminar</button>
+                  onClick={() => removeFromCart(item.id)}>Eliminar</button>
               </td>
             </tr>
           ))}

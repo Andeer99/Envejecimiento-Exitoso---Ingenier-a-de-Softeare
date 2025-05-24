@@ -1,84 +1,90 @@
 // src/components/Navbar.jsx
-import React, { useContext, useState, useRef, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { CartContext } from '../context/CartContext'
-import CartDropdown from './CartDropdown'
-import '../css/Navbar.css'
+import React, { useContext, useEffect, useRef, useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
+import { CartContext }   from "../context/CartContext"
+import { AuthContext }   from "../context/AuthContext"
+import CartDropdown      from "./CartDropdown"
+import "../css/Navbar.css"
 
 export default function Navbar({ onAuthOpen }) {
-  const { cart } = useContext(CartContext)
-  console.log("cart en navbar", cart);
-  
-  const [showDropdown, setShowDropdown] = useState(false)
-  const dropdownRef = useRef(null)
+  /* ------------------------------------------------------------------ */
+  const { cart }             = useContext(CartContext)
+  const { user, logout }     = useContext(AuthContext)
+  const isAdmin              = user?.role === "ADMIN"
+  const [showDD, setShowDD]  = useState(false)
+  const ddRef                = useRef(null)
+  const navigate             = useNavigate()
 
-  // Maneja click fuera del dropdown para cerrarlo
+  /* ------------------------------------------------------------------ */
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowDropdown(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    const close = e =>
+      ddRef.current && !ddRef.current.contains(e.target) && setShowDD(false)
+    document.addEventListener("mousedown", close)
+    return () => document.removeEventListener("mousedown", close)
   }, [])
 
-  // Suma total de productos en el carrito (ejemplo: 2x item1 + 1x item2 = 3)
-const totalItems = cart.reduce((sum, item) => sum + (item.cantidad || 0), 0)
+  const totalItems = cart.reduce((s, i) => s + (i.cantidad || 0), 0)
+  const handleLogout = () => {
+    logout()
+    navigate("/")
+  }
 
+  /* ------------------------------------------------------------------ */
   return (
     <header className="navbar">
+      {/* ---------- IZQUIERDA ---------- */}
       <div className="navbar__left">
-        <Link to="/" className="navbar__logo">Envejecimiento Exitoso</Link>
+        <Link to="/" className="navbar__logo">
+          Envejecimiento Exitoso
+        </Link>
       </div>
 
+      {/* ---------- CENTRO ---------- */}
       <div className="navbar__center">
         <select className="navbar__category">
-          <option>Todos</option>
-          <option>Temporada</option>
-          <option>Salud</option>
+          <option>Todos</option><option>Temporada</option><option>Salud</option>
         </select>
-        <input
-          type="text"
-          className="navbar__search"
-          placeholder="Buscar productos, marcas y más…"
-        />
+        <input className="navbar__search" placeholder="Buscar productos…" />
         <button className="navbar__btn-search">🔍</button>
       </div>
 
+      {/* ---------- DERECHA ---------- */}
       <nav className="navbar__right">
-        <span
-        className="navbar__link"
-        style={{ cursor: 'pointer' }}
-        onClick={onAuthOpen}
-      >Hola, Identifícate
-      </span>
-
-        <Link to="/orders" className="navbar__link">Mis Pedidos</Link>
-        {/* Carrito con badge y dropdown */}
-        <div className="navbar__link navbar__cart" style={{ position: "relative" }}>
-          <span
-            onClick={() => setShowDropdown((prev) => !prev)}
-            style={{ cursor: 'pointer', position: "relative" }}
-          >
-            🛒 Carrito
-            {totalItems > 0 && (
-              <span className="cart-badge">{totalItems}</span>
+        {user ? (
+          <>
+            {/* === ADMIN LINKS === */}
+            {isAdmin && (
+              <>
+                <Link to="/admin/productos"        className="navbar__link">
+                  Editar productos
+                </Link>
+                <Link to="/admin/productos/nuevo"  className="navbar__link">
+                  Añadir producto
+                </Link>
+              </>
             )}
+
+            {/* === COMÚN A TODOS LOS LOGUEADOS === */}
+            <Link to="/orders" className="navbar__link">Mis Pedidos</Link>
+            <button onClick={handleLogout} className="navbar__link logout-button">
+              Cerrar sesión
+            </button>
+          </>
+        ) : (
+          <span className="navbar__link" style={{ cursor: "pointer" }} onClick={onAuthOpen}>
+            Hola, identifícate
           </span>
-          {/* Dropdown */}
-          {showDropdown && (
-            <div
-              ref={dropdownRef}
-              style={{
-                position: "absolute",
-                right: 0,
-                top: "100%",
-                zIndex: 999,
-                background: "#fff",
-                boxShadow: "0 2px 8px rgba(0,0,0,.15)"
-              }}
-            >
+        )}
+
+        {/* ---------- CARRITO ---------- */}
+        <div className="navbar__link navbar__cart" style={{ position:"relative" }}>
+          <span onClick={() => setShowDD(o => !o)} style={{ cursor:"pointer" }}>
+            🛒 Carrito
+            {totalItems > 0 && <span className="cart-badge">{totalItems}</span>}
+          </span>
+
+          {showDD && (
+            <div ref={ddRef} style={{ position:"absolute", right:0, top:"100%", zIndex:999 }}>
               <CartDropdown />
             </div>
           )}

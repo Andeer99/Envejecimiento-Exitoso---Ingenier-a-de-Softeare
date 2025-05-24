@@ -10,7 +10,7 @@ export default function CartDropdown() {
     return (
       <div style={{
         padding: '1rem',
-        minWidth: 220,
+        minWidth: 300,
         color: "#333",
         textAlign: "center"
       }}>
@@ -19,11 +19,11 @@ export default function CartDropdown() {
     )
   }
 
-  const total = cart.reduce((sum, p) => sum + ((p.cantidad || 0) * (p.precioUnitario || 0)), 0)
+  const total = cart.reduce((sum, p) => sum + ((p.cantidad || 0) * (p.precio || 0)), 0)
 
   return (
     <div style={{
-      minWidth: 240,
+      minWidth: 320,
       padding: 14,
       background: "#fff",
       borderRadius: 8,
@@ -40,7 +40,7 @@ export default function CartDropdown() {
             fontSize: "1em"
           }}>
             <span style={{ color: "#222", fontWeight: 500, maxWidth: 110, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {item.nombreProducto} <span style={{ color: "#317ada" }}>x{item.cantidad || 0}</span>
+              {item.nombre} <span style={{ color: "#317ada" }}>x{item.cantidad || 0}</span>
             </span>
             <span style={{
               fontWeight: "bold",
@@ -48,7 +48,7 @@ export default function CartDropdown() {
               minWidth: 64,
               textAlign: "right"
             }}>
-              ${((item.precioUnitario || 0) * (item.cantidad || 0)).toLocaleString("es-MX", { minimumFractionDigits: 2 })}
+              ${((item.precio || 0) * (item.cantidad || 0)).toLocaleString("es-MX", { minimumFractionDigits: 2 })}
             </span>
           </li>
         ))}

@@ -8,6 +8,7 @@ public record ProductoDTO(
         String     descripcion,
         BigDecimal precio,
         Integer    stock,
+        String     imageUrl,
         String     categoria
 ) {
     public void setId(Long id) {

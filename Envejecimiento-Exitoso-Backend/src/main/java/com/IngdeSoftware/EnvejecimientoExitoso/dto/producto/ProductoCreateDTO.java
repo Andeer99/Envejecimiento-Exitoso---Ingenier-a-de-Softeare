@@ -8,5 +8,7 @@ public record ProductoCreateDTO(
         @Size(max = 255)    String     descripcion,
         @DecimalMin("0.0")  BigDecimal precio,
         @Min(0)             Integer    stock,
+        @NotBlank           String     imageUrl,
         @Size(max = 50)     String     categoria
+
 ) {}

@@ -30,6 +30,9 @@ public class Producto {
     @Column(length = 50)
     private String categoria;
 
+    @NotBlank
+    private String imageUrl;
+
     public Long getId() {
         return id;
     }
@@ -77,4 +80,11 @@ public class Producto {
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
+    public String getImageUrl(String imageUrl){
+        return imageUrl;
+    }
+    public void setImageUrl(String imageUrl){
+        this.imageUrl = imageUrl;
+    }
+
 }

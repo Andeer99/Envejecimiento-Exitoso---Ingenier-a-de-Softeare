@@ -31,9 +31,11 @@ export default function SidebarAuth({ open, onClose }) {
         body: JSON.stringify(loginData),
       });
       if (!res.ok) throw new Error('Credenciales inválidas');
-      const { accessToken, refreshToken } = await res.json();
+      const { accessToken, refreshToken, role } = await res.json();
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
+      localStorage.setItem('userRole', role);
+      localStorage.setItem('userName', loginData.name)
       onClose(); navigate('/');
     } catch (err) { setError(err.message); }
     finally { setLoading(false); }
