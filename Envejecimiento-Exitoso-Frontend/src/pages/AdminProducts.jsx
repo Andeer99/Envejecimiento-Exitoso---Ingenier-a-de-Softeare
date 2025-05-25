@@ -1,77 +1,90 @@
 // src/pages/AdminProducts.jsx
-import React, { useState, useEffect, useContext } from "react"
-import { AuthContext } from "../context/AuthContext"
-import { useNavigate } from "react-router-dom"
+import React, {
+  useState,
+  useContext,
+  useEffect            // ← importado
+} from "react"
+import { useNavigate }         from "react-router-dom"
+import { AuthContext }         from "../context/AuthContext"
+import { ProductsContext }     from "../context/ProductsContext"
+import { resolveImg } from "../utils/resolveImg";
 import "../css/global.css"
 
 export default function AdminProducts() {
+  /* ------------------------------------------------------------------ */
   const { user } = useContext(AuthContext)
-  const navigate  = useNavigate()
+  const {
+    products: items,
+    fetchProducts,
+    deleteProduct,
+    updateProduct
+  } = useContext(ProductsContext)
 
-  const [items, setItems]   = useState([])
+  const navigate = useNavigate()
+
+  /* --- redirección si NO es admin --- */
+  if (user?.role !== "ADMIN") {
+    navigate("/")
+    return null
+  }
+
+  /* ------------------------------------------------------------------ */
   const [editing, setEditing] = useState(false)
-  const [dirty, setDirty]     = useState(false)
+  const [dirty,   setDirty]   = useState(false)
 
-  const apiBase = import.meta.env.VITE_API_URL
-
-  /* -------- carga inicial -------- */
+  /* --- carga (sólo si aún no hay data) --- */
   useEffect(() => {
-    if (user?.role !== "ADMIN") return navigate("/")
-    fetch(`${apiBase}/api/productos`)
-      .then(r => r.json())
-      .then(setItems)
-      .catch(console.error)
-  }, [user, apiBase, navigate])
+    if (items.length === 0) fetchProducts()
+  }, [items, fetchProducts])
 
-  /* -------- handlers -------- */
+  /* --- local copy para edición --- */
+  const [drafts, setDrafts] = useState(items)
+  useEffect(() => setDrafts(items), [items])
+
+  /* ------------------------------------------------------------------ */
   const handleChange = (id, field, value) => {
     setDirty(true)
-    setItems(prev =>
+    setDrafts(prev =>
       prev.map(p => (p.id === id ? { ...p, [field]: value } : p))
     )
   }
 
-  const handleDelete = id => {
-    if (!window.confirm("¿Eliminar producto?")) return
-    fetch(`${apiBase}/api/productos/${id}`, { method:"DELETE" })
-      .then(() => setItems(prev => prev.filter(p => p.id !== id)))
-      .catch(console.error)
-  }
+  const handleDelete = id =>
+    window.confirm("¿Eliminar producto?") && deleteProduct(id)
 
-  const handleSave = () => {
-    Promise.all(
-      items.map(p =>
-        fetch(`${apiBase}/api/productos/${p.id}`, {
-          method:"PUT",
-          headers:{ "Content-Type":"application/json" },
-          body:JSON.stringify(p)
-        })
-      )
-    )
-      .then(() => { setEditing(false); setDirty(false) })
+  const handleSave = () =>
+    Promise.all(drafts.map(updateProduct))
+      .then(() => {
+        setEditing(false)
+        setDirty(false)
+      })
       .catch(console.error)
-  }
 
-  /* -------- render -------- */
+  /* ------------------------------------------------------------------ */
   return (
     <main className="main-content">
       <h1>Gestión de productos</h1>
 
       {/* -------- TARJETAS -------- */}
       <div className="product-cards">
-        {items.map(p => (
+        {drafts.map(p => (
           <div key={p.id} className="product-card-admin">
             <img
-              src={p.imageUrl || "/placeholder.png"}
-              alt={p.nombre}
-            />
+                src={resolveImg(p.imageUrl || p.imagenUrl)}
+                alt={p.nombre || p.nombreProducto || "Producto"}
+                 onError={e => {
+                     e.currentTarget.onerror = null;
+                     e.currentTarget.src = "/placeholder.png";
+                 }}
+                />
+
 
             <div className="card-fields">
               <label>
                 Nombre
                 <input
                   value={p.nombre}
-                  onChange={e => handleChange(p.id,"nombre",e.target.value)}
+                  onChange={e => handleChange(p.id, "nombre", e.target.value)}
                   disabled={!editing}
                 />
               </label>
@@ -80,7 +93,9 @@ export default function AdminProducts() {
                 Descripción
                 <textarea
                   value={p.descripcion}
-                  onChange={e => handleChange(p.id,"descripcion",e.target.value)}
+                  onChange={e =>
+                    handleChange(p.id, "descripcion", e.target.value)
+                  }
                   disabled={!editing}
                 />
               </label>
@@ -91,7 +106,9 @@ export default function AdminProducts() {
                   <input
                     type="number"
                     value={p.precio}
-                    onChange={e => handleChange(p.id,"precio",Number(e.target.value))}
+                    onChange={e =>
+                      handleChange(p.id, "precio", Number(e.target.value))
+                    }
                     disabled={!editing}
                   />
                 </label>
@@ -101,7 +118,9 @@ export default function AdminProducts() {
                   <input
                     type="number"
                     value={p.stock}
-                    onChange={e => handleChange(p.id,"stock",Number(e.target.value))}
+                    onChange={e =>
+                      handleChange(p.id, "stock", Number(e.target.value))
+                    }
                     disabled={!editing}
                   />
                 </label>
@@ -110,7 +129,7 @@ export default function AdminProducts() {
                   Tag
                   <input
                     value={p.tag || ""}
-                    onChange={e => handleChange(p.id,"tag",e.target.value)}
+                    onChange={e => handleChange(p.id, "tag", e.target.value)}
                     disabled={!editing}
                   />
                 </label>
@@ -126,7 +145,7 @@ export default function AdminProducts() {
         ))}
       </div>
 
-      {/* -------- BOTÓN EDITAR / GUARDAR -------- */}
+      {/* -------- BOTONES -------- */}
       <div className="admin-actions">
         {editing ? (
           <button

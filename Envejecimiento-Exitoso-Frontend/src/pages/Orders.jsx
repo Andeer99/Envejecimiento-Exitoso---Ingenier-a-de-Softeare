@@ -1,5 +1,6 @@
 // src/pages/Orders.jsx
 import React, { useState, useEffect } from "react";
+import { fetchAuth } from "../utils/fetchAuth";
 
 export default function Orders() {
   const [orders, setOrders] = useState([]);            // ← ahora sí importado
@@ -8,7 +9,7 @@ export default function Orders() {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`${import.meta.env.VITE_API_URL}/pedidos`)
+    fetchAuth(`${import.meta.env.VITE_API_URL}/pedidos`)
       .then((res) => {
         if (!res.ok) throw new Error("No se pudieron cargar los pedidos");
         return res.json();

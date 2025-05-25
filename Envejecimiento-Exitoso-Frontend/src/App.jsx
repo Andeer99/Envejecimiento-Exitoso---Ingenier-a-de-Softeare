@@ -4,7 +4,7 @@ import { Routes, Route, Navigate } from "react-router-dom"
 
 /* ------------ CONTEXTOS ------------ */
 import { AuthContext } from "./context/AuthContext"
-
+import { ProductsContext } from "./context/ProductsContext"
 /* ------------ COMPONENTES ------------ */
 import Navbar        from "./components/Navbar"
 import SidebarAuth   from "./components/SidebarAuth"

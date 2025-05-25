@@ -74,6 +74,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/productos/**")
                         .permitAll()
 
+                        .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
+
                         // Recursos estáticos y error
                         .requestMatchers("/", "/css/**", "/js/**", "/error")
                         .permitAll()

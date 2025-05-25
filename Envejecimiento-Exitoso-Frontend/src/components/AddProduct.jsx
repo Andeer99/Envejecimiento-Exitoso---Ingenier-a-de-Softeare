@@ -110,8 +110,8 @@ export default function AddProduct() {
           <input
             id="imageUrl"
             name="imageUrl"
-            type="url"
-            placeholder="https://ejemplo.com/imagen.jpg"
+            type="text"
+            placeholder="/uploads/"
             value={form.imageUrl}
             onChange={handleChange}
           />

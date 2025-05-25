@@ -7,7 +7,7 @@ public record ProductoResponseDTO(
         String nombre,
         String descripcion,
         BigDecimal precio,
-        int stock,
+        Integer stock,
         String imageUrl,
         String categoria
 ) {}
