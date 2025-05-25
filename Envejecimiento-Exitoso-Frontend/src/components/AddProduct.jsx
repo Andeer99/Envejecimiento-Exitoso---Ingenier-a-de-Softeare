@@ -1,146 +1,156 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import '../css/addProduct.css';
+import React, { useState } from "react";
+import { useNavigate }       from "react-router-dom";
+import "../css/addProduct.css";
 
 export default function AddProduct() {
-  const [form, setForm] = useState({
-    nombre: '',
-    descripcion: '',
-    precio: '',
-    stock: '',
-    imageUrl: '',
-    tag: ''
-  });
-  const [error, setError] = useState('');
+  const apiBase = import.meta.env.VITE_API_URL;          // ← base del backend
   const navigate = useNavigate();
 
+  /* ----------------------------- estado ----------------------------- */
+  const [form,  setForm]  = useState({
+    nombre: "",
+    descripcion: "",
+    precio: "",
+    stock: "",
+    imageUrl: "",      // aquí almacenaremos /uploads/xxxx.png
+    tag: ""
+  });
+  const [error, setError] = useState("");
+
+  /* ---------------------- handlers de formulario -------------------- */
   const handleChange = e =>
     setForm(f => ({ ...f, [e.target.name]: e.target.value }));
 
+  /** Sube la imagen y guarda la ruta que devuelve el backend */
+  const handleFile = async e => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const fd    = new FormData();
+      fd.append("file", file);
+
+      const token = localStorage.getItem("accessToken");
+      const res   = await fetch(`${apiBase}/api/upload`, {
+        method : "POST",
+        headers: { Authorization: `Bearer ${token}` }, // *NO* pongas Content-Type
+        body   : fd
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.url)
+        throw new Error(data.message || "Error al subir la imagen");
+
+      // ⚠️  Importante: guardamos EXACTAMENTE la ruta que vino del backend
+      //     (normalmente "/uploads/uuid.png")
+      setForm(f => ({ ...f, imageUrl: data.url }));
+    } catch (err) {
+      setError(err.message || "Error inesperado");
+    }
+  };
+
+  /** Envía el nuevo producto */
   const handleSubmit = async e => {
     e.preventDefault();
-    setError('');
+    setError("");
+
     try {
-      const token = localStorage.getItem('accessToken');
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/productos`, {
-        method: 'POST',
+      const token = localStorage.getItem("accessToken");
+      const res   = await fetch(`${apiBase}/api/productos`, {
+        method : "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          "Content-Type": "application/json",
+          Authorization : `Bearer ${token}`
         },
         body: JSON.stringify({
-          nombre: form.nombre,
-          descripcion: form.descripcion,
+          ...form,
           precio: parseFloat(form.precio),
-          stock: parseInt(form.stock, 10),
-          imageUrl: form.imageUrl,
-          tag: form.tag
+          stock : parseInt(form.stock, 10)
         })
       });
-      if (!res.ok) throw new Error('No se pudo crear el producto');
-      navigate('/');
+
+      if (!res.ok) throw new Error("No se pudo crear el producto");
+      navigate("/");
     } catch (err) {
       setError(err.message);
     }
   };
 
+  /* ---------------------------- render ----------------------------- */
   return (
-    <div className="add-product">
-      <h2>Nuevo producto</h2>
+    <main className="add-product">
+      <h1>Nuevo producto</h1>
       {error && <p className="error">{error}</p>}
+
       <form onSubmit={handleSubmit}>
         {/* Nombre */}
-        <div className="input-group">
-          <label htmlFor="nombre">Nombre</label>
+        <label>Nombre
           <input
-            id="nombre"
             name="nombre"
-            placeholder="Nombre del producto"
             value={form.nombre}
             onChange={handleChange}
             required
           />
-        </div>
+        </label>
 
         {/* Descripción */}
-        <div className="input-group">
-          <label htmlFor="descripcion">Descripción</label>
+        <label>Descripción
           <textarea
-            id="descripcion"
             name="descripcion"
-            placeholder="Descripción"
             value={form.descripcion}
             onChange={handleChange}
             required
           />
-        </div>
+        </label>
 
         {/* Precio */}
-        <div className="input-group">
-          <label htmlFor="precio">Precio</label>
+        <label>Precio
           <input
-            id="precio"
-            name="precio"
             type="number"
             step="0.01"
-            placeholder="0.00"
+            name="precio"
             value={form.precio}
             onChange={handleChange}
             required
           />
-        </div>
+        </label>
 
         {/* Stock */}
-        <div className="input-group">
-          <label htmlFor="stock">Stock</label>
+        <label>Stock
           <input
-            id="stock"
-            name="stock"
             type="number"
-            placeholder="0"
+            name="stock"
             value={form.stock}
             onChange={handleChange}
             required
           />
-        </div>
+        </label>
 
-        {/* URL de imagen */}
-        <div className="input-group">
-          <label htmlFor="imageUrl">URL de la imagen</label>
+        {/* Imagen: subir archivo */}
+        <label>Imagen
+          <input type="file" accept="image/*" onChange={handleFile} />
+        </label>
+
+        {/* Campo solo-lectura con la URL devuelta */}
+        <label>URL (auto)
           <input
-            id="imageUrl"
             name="imageUrl"
-            type="text"
-            placeholder="/uploads/"
             value={form.imageUrl}
-            onChange={handleChange}
+            readOnly
           />
-          {form.imageUrl && (
-            <div className="image-preview">
-              <img src={form.imageUrl} alt="Previsualización" />
-            </div>
-          )}
-        </div>
+        </label>
 
-        {/* Tag / Identificador */}
-        <div className="input-group">
-          <label htmlFor="tag">Etiqueta (para navbar)</label>
+        {/* Tag opcional */}
+        <label>Tag
           <input
-            id="tag"
             name="tag"
-            placeholder="Ej: novedades"
             value={form.tag}
             onChange={handleChange}
           />
-          {form.tag && (
-            <div className="tag-list">
-              <span>{form.tag}</span>
-            </div>
-          )}
-        </div>
+        </label>
 
-        <button type="submit">Crear producto</button>
+        <button className="btn-success" type="submit">Crear producto</button>
       </form>
-    </div>
+    </main>
   );
 }

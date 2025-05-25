@@ -1,4 +1,3 @@
-// src/main/java/com/IngdeSoftware/EnvejecimientoExitoso/config/StaticResourceConfig.java
 package com.IngdeSoftware.EnvejecimientoExitoso.config;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -9,15 +8,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class StaticResourceConfig implements WebMvcConfigurer {
 
-    // Ruta absoluta donde subes las imágenes (ajústala en application.properties)
-    @Value("${app.upload.dir}")
-    private String uploadDir;
+    /** Carpeta física donde se guardan las imágenes (relativa al JAR/contendor). */
+    @Value("${app.upload.dir:uploads}")
+    private String uploadDir;             // se leerá de application.properties
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        /*  /uploads/rosas.jpg  ->  file:/…/uploads/rosas.jpg   */
+        //  /uploads/xxx.jpg  →  file:<uploadDir>/xxx.jpg
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations("file:" + uploadDir + "/")
-                .setCachePeriod(3600);        // 1 h de caché
+                .setCachePeriod(3600);
     }
 }

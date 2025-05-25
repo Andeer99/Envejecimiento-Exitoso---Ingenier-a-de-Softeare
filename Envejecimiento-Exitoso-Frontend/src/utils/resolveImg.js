@@ -1,23 +1,20 @@
-// src/utils/resolveImg.js
-
 /**
- * Devuelve una URL lista para <img src="…">:
- *   • /uploads/…  →  la dejamos tal cual (se sirve desde el frontend)
- *   • http(s)://… →  la dejamos tal cual (CDN, S3…)
- *   • cualquier otra ruta relativa → la anteponemos a la API
+ * Devuelve una URL lista para <img src="…">
+ *  - Si es absoluta (http/https) ⇒ se deja tal cual
+ *  - Si empieza por /uploads o uploads ⇒ prefiere VITE_API_URL
+ *  - BONUS: si viene por error con "/api/uploads" lo corregimos
  */
 export function resolveImg(u) {
-  if (!u) return "/placeholder.png";              // imagen genérica
+  if (!u) return "/placeholder.png";
 
-  // 1) URL absoluta (https://…)
+  // absoluta
   if (/^https?:\/\//i.test(u)) return u;
 
-  // 2) Imágenes estáticas guardadas en el propio frontend
-  if (u.startsWith("/uploads/") || u.startsWith("uploads/"))
-    return u.startsWith("/") ? u : `/${u}`;
+  // corrige paths antiguos
+  if (u.startsWith("/api/uploads")) u = u.replace("/api/uploads", "/uploads");
 
-  // 3) Rutas que realmente vive el backend (/uploads en servidor, /files, etc.)
-  const api = import.meta.env.VITE_API_URL.replace(/\/+$/, "");
+  const api  = import.meta.env.VITE_API_URL.replace(/\/+$/, "");
   const path = u.startsWith("/") ? u : `/${u}`;
+
   return `${api}${path}`;
 }
