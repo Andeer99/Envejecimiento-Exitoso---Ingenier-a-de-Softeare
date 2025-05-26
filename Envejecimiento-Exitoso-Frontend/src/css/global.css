@@ -378,3 +378,12 @@ main h1{
   color:var(--color-text);
   letter-spacing:-.5px;
 }
+/* global.css o auth.css */
+.auth-card{
+  width:clamp(260px, 92vw, 420px);     /* se adapta de 260 px → 420 px */
+  margin:56px auto;
+  padding:34px 26px;
+  background:#fff;
+  border-radius:15px;
+  box-shadow:0 2px 14px #0001;
+}

@@ -1,12 +1,13 @@
 import React, { useContext } from 'react'
 import { CartContext } from '../context/CartContext'
 import { useNavigate } from 'react-router-dom'
+import {resolveImg} from "../utils/resolveImg";
 
 export default function Cart() {
   const { cart, removeFromCart, updateQuantity } = useContext(CartContext)
   const navigate = useNavigate()
 
-  const total = cart.reduce((sum, p) => sum + (p.cantidad || 0) * (p.precioUnitario || 0), 0)
+  const total = cart.reduce((sum, p) => sum + (p.cantidad || 0) * (p.precio  || 0),  0 )
 
   function handleCantidadChange(id, cantidad) {
     if (cantidad < 1) return
@@ -31,7 +32,7 @@ export default function Cart() {
         <tbody>
           {cart.map(item => (
             <tr key={item.id}>
-              <td><img src={item.imageUrl} alt={item.nombre} width={48} /></td>
+              <td><img src={resolveImg(item.imageUrl)} alt={item.nombre} width={48} /></td>
               <td>{item.nombre}</td>
               <td>
                 <input

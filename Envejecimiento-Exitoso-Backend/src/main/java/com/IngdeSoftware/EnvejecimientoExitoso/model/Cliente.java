@@ -14,7 +14,7 @@ import lombok.ToString;
 @Getter @Setter @ToString(callSuper = true)
 public class Cliente extends Usuario {
 
-    @Column(length = 13, nullable = false, unique = true)   // 13 dígitos para RFC personas físicas
+    @Column(length = 13, nullable = true, unique = true)   // 13 dígitos para RFC personas físicas
     @NotBlank(message = "El RFC es obligatorio")
     private String rfc;
 

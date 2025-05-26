@@ -61,6 +61,9 @@ export default function Navbar({ onAuthOpen }) {
                 <Link to="/admin/productos/nuevo"  className="navbar__link">
                   Añadir producto
                 </Link>
+                <Link to="/admin/admins/new"       className="btn-admin">
+                Alta administrador
+                </Link>
               </>
             )}
 

@@ -145,3 +145,6 @@
   font-size: 0.82rem;
   font-weight: 500;
 }
+@media(max-width:430px){
+  .add-product{padding:1.4rem 1.2rem;}
+}

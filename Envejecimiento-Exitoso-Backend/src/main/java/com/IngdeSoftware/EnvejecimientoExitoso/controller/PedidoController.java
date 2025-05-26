@@ -21,7 +21,7 @@ public class PedidoController {
 
     /* ---------- Crear pedido desde carrito ---------- */
     @PostMapping
-    @PreAuthorize("hasRole('CLIENTE')")
+    @PreAuthorize("hasAnyRole('CLIENTE', 'ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     public PedidoDTO crearPedido(Authentication auth) {
         return service.createOrder(auth.getName());

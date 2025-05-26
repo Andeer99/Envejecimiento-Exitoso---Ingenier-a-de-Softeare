@@ -20,6 +20,7 @@ import Register      from "./pages/Register"
 import ProductDetail from "./pages/ProductDetail"
 import AddProduct    from "./components/AddProduct"
 import AdminProducts from "./pages/AdminProducts"
+import AddAdmin from './pages/AddAdmin'
 
 export default function App() {
   const [authOpen, setAuthOpen] = useState(false)
@@ -60,6 +61,14 @@ export default function App() {
           element={
             <RequireAdmin>
               <AddProduct />
+            </RequireAdmin>
+          }
+        />
+        <Route 
+          path="/admin/admins/new" 
+          element={
+            <RequireAdmin>
+              <AddAdmin />
             </RequireAdmin>
           }
         />

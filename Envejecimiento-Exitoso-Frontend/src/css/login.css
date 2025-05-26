@@ -122,4 +122,6 @@ body {
     text-align: center;
     padding: 15px;
   }
- 
+ @media(max-width:480px){
+  .login-container{max-width:94%;padding:22px;}
+}

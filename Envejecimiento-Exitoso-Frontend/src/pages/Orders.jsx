@@ -9,7 +9,7 @@ export default function Orders() {
 
   useEffect(() => {
     setLoading(true);
-    fetchAuth(`${import.meta.env.VITE_API_URL}/pedidos`)
+    fetchAuth(`${import.meta.env.VITE_API_URL}/api/pedidos`)
       .then((res) => {
         if (!res.ok) throw new Error("No se pudieron cargar los pedidos");
         return res.json();

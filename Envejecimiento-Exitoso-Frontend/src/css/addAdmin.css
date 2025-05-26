@@ -1,0 +1,112 @@
+/* src/css/addAdmin.css */
+
+/* 1) Variables globales */
+:root {
+  --color-bg:       #ffffff;
+  --color-border:   #dddddd;
+  --color-primary:  #2273e0;
+  --color-primary-hover: #1b5cb8;
+  --color-text:     #2c3e50;
+  --color-error:    #e74c3c;
+  --radius:         0.5rem;
+  --shadow:         0 2px 12px rgba(0,0,0,0.08);
+  --padding:        2rem;
+  --padding-sm:     1.5rem;
+}
+
+
+/* 3) Contenedor del formulario */
+.add-admin {
+  max-width: 500px;
+  margin: 4rem auto;
+  padding: var(--padding);
+  background: var(--color-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.add-admin h2 {
+  margin-bottom: 1.5rem;
+  font-size: 1.75rem;
+  color: var(--color-text);
+  text-align: center;
+}
+.add-admin .error {
+  color: var(--color-error);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+/* 4) Formulario internamente */
+/* 4) Formulario internamente (sólo esto) */
+.add-admin form {
+  display: grid;
+  gap: 1rem;             /* espacio vertical entre filas */
+}
+
+.add-admin form label {
+  font-weight: 500;
+  margin: 0;             /* quitamos márgenes extras */
+}
+
+.add-admin form input {
+  width: 100%;           /* ocupa todo el ancho */
+  padding: 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.add-admin form button {
+  width: 100%;           /* botón a lo ancho del formulario */
+  padding: 0.75rem;
+  background-color: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.add-admin form button:hover {
+  background-color: var(--color-primary-hover);
+}
+/* 5) Media-query para pantallas pequeñas (iPhone 12 ~390px) */
+@media (max-width: 420px) {
+  .add-admin {
+    margin: 2rem 1rem;
+    padding: var(--padding-sm);
+  }
+  .add-admin h2 {
+    font-size: 1.5rem;
+  }
+  .add-admin form input {
+    padding: 0.65rem;
+  }
+  .add-admin form button {
+    width: 100%;
+    text-align: center;
+    align-self: stretch;
+    margin-top: 0.5rem;
+  }
+  .navbar .btn-admin {
+    margin-left: 0.5rem;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+  }
+}
+.navbar .btn-admin {
+  /* mismo espaciado que “Editar productos” / “Añadir producto” */
+ 
+  /* mismo tamaño de letra */
+  font-size: 0.8.3em;
+  line-height: 0.9;
+
+  /* quitar cualquier estilo extra */
+  background: none;
+  border: none;
+  border-radius: 0;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}

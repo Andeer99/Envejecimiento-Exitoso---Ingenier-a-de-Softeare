@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react'
-import { CartContext }             from '../context/CartContext'
-import { useNavigate }             from 'react-router-dom'
+import { CartContext } from '../context/CartContext'
+import { useNavigate } from 'react-router-dom'
+import { resolveImg } from '../utils/resolveImg'
 
 export default function Payment() {
   const { cart, clearCart } = useContext(CartContext)
@@ -10,13 +11,12 @@ export default function Payment() {
   const token   = localStorage.getItem('accessToken')
 
   const total = cart.reduce(
-    (sum, p) => sum + (p.cantidad||0)*(p.precioUnitario||0),
+    (sum, p) => sum + (p.cantidad||0)*(p.precio||0),
     0
   )
 
-  // 1️⃣ Crea el pedido y devuelve su id
   async function crearPedido() {
-    const res = await fetch(`${apiBase}/pedidos`, {
+    const res = await fetch(`${apiBase}/api/pedidos`, {
       method: "POST",
       headers: {
         "Content-Type":  "application/json",
@@ -25,14 +25,12 @@ export default function Payment() {
       body: JSON.stringify({ items: cart })
     })
     if (!res.ok) throw new Error("Error creando pedido")
-    const data = await res.json()
-    return data.id
+    return (await res.json()).id
   }
 
-  // 2️⃣ Inicia el pago para ese pedido
   async function iniciarPago(pedidoId) {
     const res = await fetch(
-      `${apiBase}/pagos/iniciar?pedidoId=${pedidoId}`, {
+      `${apiBase}/api/pagos/iniciar?pedidoId=${pedidoId}`, {
         method: "POST",
         headers: { "Authorization": `Bearer ${token}` }
       }
@@ -41,7 +39,6 @@ export default function Payment() {
     return await res.json()
   }
 
-  // 3️⃣ Función que orquesta todo
   async function confirmarPago(e) {
     e.preventDefault()
     setLoading(true)
@@ -58,18 +55,41 @@ export default function Payment() {
     }
   }
 
+  if (!cart.length) {
+    return <div style={{ padding: 32, textAlign: "center" }}>
+      Tu carrito está vacío.
+    </div>
+  }
+
   return (
-    <div style={{ maxWidth:600, margin:"56px auto", padding:30 }}>
+    <div className="payment-container">
       <h2>Resumen del Pedido</h2>
-      <p>Total: <strong>${total.toFixed(2)}</strong></p>
+
+      <div className="payment-items">
+        {cart.map(item => (
+          <div key={item.id} className="payment-item">
+            <img
+              src={resolveImg(item.imageUrl)}
+              alt={item.nombre}
+              onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = "/placeholder.png" }}
+            />
+            <div className="item-info">
+              <p className="item-name">{item.nombre}</p>
+              <p className="item-qty">Cantidad: {item.cantidad}</p>
+              <p className="item-sub">Subtotal: ${(item.precio * item.cantidad).toFixed(2)}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="summary-total">
+        Total: <strong>${total.toFixed(2)}</strong>
+      </div>
+
       <button
+        className="confirm-btn"
         onClick={confirmarPago}
         disabled={loading}
-        style={{
-          width:"100%", padding:12, fontSize:16,
-          background:"#28a745", color:"#fff", border:"none", borderRadius:4,
-          cursor: loading ? "wait" : "pointer"
-        }}
       >
         {loading ? "Procesando…" : "Confirmar Pago"}
       </button>

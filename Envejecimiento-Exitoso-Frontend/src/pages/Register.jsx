@@ -1,58 +1,130 @@
+// src/pages/Register.jsx
 import React, { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import "../css/registro.css"
 
 export default function Register() {
   const navigate = useNavigate()
   const [form, setForm] = useState({
-    nombre: "", email: "", password: "",
-    confirmPassword: "", direccion: "", telefono: ""
+    nombre: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    direccion: "",
+    telefono: ""
   })
+  const [error, setError] = useState("")
 
-  function handleChange(e) {
-    setForm({ ...form, [e.target.name]: e.target.value })
-  }
+  const handleChange = e =>
+    setForm(f => ({ ...f, [e.target.name]: e.target.value }))
 
-  function handleSubmit(e) {
+  const handleSubmit = async e => {
     e.preventDefault()
+    setError("")
+
     if (form.password !== form.confirmPassword) {
-      alert("Las contraseñas no coinciden.")
+      setError("Las contraseñas no coinciden")
       return
     }
-    fetch(`${import.meta.env.VITE_API_URL}/api/clientes`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        nombre: form.nombre,
-        email: form.email,
-        password: form.password,
-        direccion: form.direccion,
-        telefono: form.telefono
-      })
-    })
-      .then(res => {
-        if (!res.ok) throw new Error("Registro fallido")
-        return res.json()
-      })
-      .then(() => {
-        alert("¡Registro exitoso!")
-        navigate("/login")
-      })
-      .catch(() => alert("Error al registrar usuario"))
+
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/clientes`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            nombre:    form.nombre,
+            email:     form.email,
+            password:  form.password,
+            direccion: form.direccion,
+            telefono:  form.telefono
+          })
+        }
+      )
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body.message || "Registro fallido")
+      }
+      alert("¡Registro exitoso!")
+      navigate("/login")
+    } catch (err) {
+      console.error(err)
+      setError(err.message)
+    }
   }
 
   return (
-    <div style={{ maxWidth: 390, margin: "56px auto", padding: "34px 26px", background: "#fff", borderRadius: 15, boxShadow: "0 2px 14px #0001" }}>
-      <h2 style={{ textAlign: "center", fontWeight: 800, marginBottom: 24 }}>Registro</h2>
+    <div className="register-container">
+      <h2>Registro</h2>
+      {error && <div className="error-message">{error}</div>}
+
       <form onSubmit={handleSubmit}>
-        {/* ...todos los inputs igual que antes, usando handleChange y form.* */}
-        {/* Botón */}
-        <button type="submit" style={{ width: "100%", background: "#2385e6", color: "#fff", fontWeight: 700, border: "none", borderRadius: 5, padding: "12px 0", fontSize: 17, cursor: "pointer" }}>
+        <label>Nombre</label>
+        <input
+          name="nombre"
+          value={form.nombre}
+          onChange={handleChange}
+          required
+        />
+
+        <label>Email</label>
+        <input
+          type="email"
+          name="email"
+          value={form.email}
+          onChange={handleChange}
+          required
+        />
+
+        <label>Contraseña</label>
+        <input
+          type="password"
+          name="password"
+          value={form.password}
+          onChange={handleChange}
+          required
+        />
+
+        <label>Confirmar contraseña</label>
+        <input
+          type="password"
+          name="confirmPassword"
+          value={form.confirmPassword}
+          onChange={handleChange}
+          required
+        />
+
+        <label>Dirección</label>
+        <input
+          name="direccion"
+          value={form.direccion}
+          onChange={handleChange}
+          required
+        />
+
+        <label>Teléfono</label>
+        <input
+          name="telefono"
+          value={form.telefono}
+          onChange={handleChange}
+          required
+        />
+
+        <button type="submit" className="register-btn">
           Registrar
         </button>
-        {/* Link a login */}
-        <div style={{ marginTop: 10, textAlign: "center" }}>
-          <a href="#" style={{ color: "#2976e0", fontSize: 15, textDecoration: "underline" }} onClick={e => { e.preventDefault(); navigate("/login") }}>
-            ¿Ya tienes cuenta? Inicia sesión
+
+        <div className="login-link">
+          ¿Ya tienes cuenta?{" "}
+          <a
+            href="#"
+            onClick={e => {
+              e.preventDefault()
+              navigate("/login")
+            }}
+          >
+            Inicia sesión
           </a>
         </div>
       </form>
