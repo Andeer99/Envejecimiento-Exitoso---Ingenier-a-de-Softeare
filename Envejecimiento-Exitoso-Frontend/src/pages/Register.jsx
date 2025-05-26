@@ -6,22 +6,24 @@ import "../css/registro.css"
 export default function Register() {
   const navigate = useNavigate()
   const [form, setForm] = useState({
-    nombre: "",
+    nombreCompleto: "",
     email: "",
     password: "",
     confirmPassword: "",
-    direccion: "",
-    telefono: ""
+    rfc: ""
   })
   const [error, setError] = useState("")
 
-  const handleChange = e =>
-    setForm(f => ({ ...f, [e.target.name]: e.target.value }))
+  const handleChange = e =>{
+    console.log("CHANGE", e.target.name, e.target.value);
+    
+    setForm(f => ({ ...f, [e.target.name]: e.target.value }))}
 
   const handleSubmit = async e => {
     e.preventDefault()
     setError("")
-
+    console.log("SUMBIT", form);
+    
     if (form.password !== form.confirmPassword) {
       setError("Las contraseñas no coinciden")
       return
@@ -34,11 +36,10 @@ export default function Register() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            nombre:    form.nombre,
+            nombreCompleto:    form.nombreCompleto,
             email:     form.email,
             password:  form.password,
-            direccion: form.direccion,
-            telefono:  form.telefono
+            rfc:       form.rfc
           })
         }
       )
@@ -60,9 +61,9 @@ export default function Register() {
       {error && <div className="error-message">{error}</div>}
 
       <form onSubmit={handleSubmit}>
-        <label>Nombre</label>
+        <label>Nombre Completo</label>
         <input
-          name="nombre"
+          name="nombreCompleto"
           value={form.nombre}
           onChange={handleChange}
           required
@@ -94,22 +95,14 @@ export default function Register() {
           onChange={handleChange}
           required
         />
-
-        <label>Dirección</label>
+        <label>RFC</label>
         <input
-          name="direccion"
-          value={form.direccion}
+          name="rfc"
+          value={form.rfc}
           onChange={handleChange}
           required
         />
 
-        <label>Teléfono</label>
-        <input
-          name="telefono"
-          value={form.telefono}
-          onChange={handleChange}
-          required
-        />
 
         <button type="submit" className="register-btn">
           Registrar
@@ -130,4 +123,6 @@ export default function Register() {
       </form>
     </div>
   )
+  console.log("RENDER", form);
+  
 }

@@ -1,7 +1,9 @@
 package com.IngdeSoftware.EnvejecimientoExitoso.controller;
 
+import com.IngdeSoftware.EnvejecimientoExitoso.dto.pedido.PedidoCreateDTO;
 import com.IngdeSoftware.EnvejecimientoExitoso.dto.pedido.PedidoDTO;
 import com.IngdeSoftware.EnvejecimientoExitoso.service.PedidoService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -19,12 +21,15 @@ public class PedidoController {
         this.service = service;
     }
 
-    /* ---------- Crear pedido desde carrito ---------- */
+    /* ---------- Crear pedido desde carrito (o desde DTO) ---------- */
     @PostMapping
     @PreAuthorize("hasAnyRole('CLIENTE', 'ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
-    public PedidoDTO crearPedido(Authentication auth) {
-        return service.createOrder(auth.getName());
+    public PedidoDTO crearPedido(
+            Authentication auth,
+            @Valid @RequestBody PedidoCreateDTO pedidoCreateDTO
+    ) {
+        return service.createOrderFromDto(auth.getName(), pedidoCreateDTO);
     }
 
     /* ---------- Mis pedidos ---------- */
@@ -40,12 +45,15 @@ public class PedidoController {
     public PedidoDTO detalle(@PathVariable Long id) {
         return service.findByIdDTO(id);
     }
+
     /** Cancela (no borra) un pedido cambiando su estado a CANCELADO */
     @PutMapping("/{id}/cancelar")
     @PreAuthorize("hasRole('CLIENTE')")
     @ResponseStatus(HttpStatus.OK)
-    public PedidoDTO cancelarPedido(@PathVariable Long id, Authentication auth) {
-        // opcional: validar que auth.getName() sea el propietario
+    public PedidoDTO cancelarPedido(
+            @PathVariable Long id,
+            Authentication auth
+    ) {
         return service.cancelarPedido(id, auth.getName());
     }
 }

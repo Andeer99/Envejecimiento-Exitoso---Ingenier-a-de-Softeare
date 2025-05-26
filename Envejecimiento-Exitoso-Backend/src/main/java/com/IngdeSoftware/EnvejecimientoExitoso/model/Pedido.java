@@ -96,7 +96,7 @@ public class Pedido {
         return p;
     }
 
-    private void calcularTotal() {
+    public void calcularTotal() {
         this.total = items.stream()
                 .map(PedidoItem::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
